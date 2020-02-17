@@ -2,6 +2,8 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import losses
 
+from sklearn.mixture import GaussianMixture
+
 
 class Encoder(layers.Layer):
 
@@ -94,11 +96,11 @@ class VariationalDeepEmbedding(VariationalAutoEncoder):
                  n_components=5,
                  name='VariationalDeepEmbedding'):
 
-    super(VariationalDeepEmbedding, self).__init__(origina_dim=original_dim,
-                                                     latent_dim=latent_dim,
-                                                     name=name)
-    n_components = 5
-    gmm = None
+        super(VariationalDeepEmbedding, self).__init__(origina_dim=original_dim,
+                                                        latent_dim=latent_dim,
+                                                        name=name)
+        self.n_components = n_components
+        self.gmm = None
 
     def call(self, x):
         mu, logvar = self.encoder(x)
@@ -112,12 +114,21 @@ class VariationalDeepEmbedding(VariationalAutoEncoder):
         loss = 0
         return loss
 
-    def fit(self, *args):
+    def fit(self, X, *args):
         if self.gmm:
             super(VariationalDeepEmbedding, self).fit(*args)
         else:
             print('Fitting GMM')
-            self.fit(*args)
+            self.fit_gmm(X)
+            self.fit(X, X, *args)
+
+    def fit_gmm(self, X):
+        self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
+        self.gmm.fit(X)
+        self.pi_prior = self.gmm.weights_
+        self.mu_prior = self.gmm.means_
+        self.logvar_prior = self.gmm.covariances_
+
 
 
 
