@@ -1,0 +1,5 @@
+PyTorch-VaDE/data/*
+os.chdir('..')weights/*
+MNIST/*
+figures/*
+figures/*/
