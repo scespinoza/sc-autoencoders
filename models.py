@@ -17,6 +17,7 @@ class Encoder(tf.keras.Model):
         x = self.h2(x)
         mu = self.mu_dense(x)
         logvar = self.logvar_dense(x)
+        return mu, logvar
 
 class Decoder(tf.keras.Model):
 
@@ -42,18 +43,12 @@ class AutoEncoder(tf.keras.Model):
         super(AutoEncoder, self).__init__(name=name)
         self.encoder = Encoder(original_dim=original_dim, latent_dim=latent_dim)
         self.decoder = Decoder(original_dim=original_dim, latent_dim=latent_dim)
-
-    @tf.function
-    def encode(self, x):
-        return self.encoder(x)
-
-    @tf.function
-    def decode(self, x):
-        return self.decoder(x)
+        self.original_dim = original_dim
+        self.latent_dim = latent_dim
 
     def call(self, x):
-        x = self.encode(x)
-        return self.decode(x)
+        x, _ = self.encoder(x)
+        return self.decoder(x)
 
     def compute_loss(self, x, x_hat):
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
