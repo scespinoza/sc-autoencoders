@@ -1,0 +1,9 @@
+__pycache__
+.ipynb_checkpoints
+data
+raw-data
+figures
+weights
+tmp
+models
+results
