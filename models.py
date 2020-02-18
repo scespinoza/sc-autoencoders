@@ -183,7 +183,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
             self.autoencoder.fit(X, X, epochs=30)
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
-
+        print("Fitting GMM")
         z, _ = self.autoencoder.encoder(X)
         self.fit_gmm(z.numpy())
             
