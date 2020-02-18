@@ -1,8 +1,12 @@
+import os
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import losses
 
 from sklearn.mixture import GaussianMixture
+from sklearn.manifold import TSNE
+
+import matplotlib.pyplot as plt
 
 
 class Encoder(layers.Layer):
@@ -45,7 +49,7 @@ class SamplingLayer(layers.Layer):
 
     def call(self, inputs):
         mu, logvar = inputs
-        eps = tf.random.normal(shape=tf.shape(mean))
+        eps = tf.random.normal(shape=tf.shape(mu))
         return mu + tf.exp(logvar / 2) * eps
 
 
@@ -63,6 +67,10 @@ class AutoEncoder(tf.keras.Model):
         x, _ = self.encoder(x)
         return self.decoder(x)
 
+    def encode(self, x):
+        z, _ = self.encoder(x)
+        return z.numpy()
+
     def reconstruction_loss(self, x, x_hat):
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
 
@@ -70,7 +78,7 @@ class AutoEncoder(tf.keras.Model):
 class VariationalAutoEncoder(AutoEncoder):
 
     def __init__(self, original_dim=5491, latent_dim=10, name='VariationalAutoEncoder'):
-        super(VariationalAutoEncoder, self).__init__(origina_dim=original_dim,
+        super(VariationalAutoEncoder, self).__init__(original_dim=original_dim,
                                                      latent_dim=latent_dim,
                                                      name=name)
         self.sampling = SamplingLayer()
@@ -81,6 +89,10 @@ class VariationalAutoEncoder(AutoEncoder):
         kl_loss = self.vae_loss([mu, logvar])
         self.add_loss(kl_loss)
         return self.decoder(z)
+
+    def encode(self, x):
+        mu, logvar = self.encoder(x)
+        return self.sampling([mu, logvar])
 
     def vae_loss(self, inputs):
         mu, logvar = inputs
@@ -94,6 +106,7 @@ class VariationalDeepEmbedding(VariationalAutoEncoder):
                  original_dim=5491,
                  latent_dim=10,
                  n_components=5,
+                 pretrain=True,
                  name='VariationalDeepEmbedding'):
 
         super(VariationalDeepEmbedding, self).__init__(origina_dim=original_dim,
@@ -101,6 +114,8 @@ class VariationalDeepEmbedding(VariationalAutoEncoder):
                                                         name=name)
         self.n_components = n_components
         self.gmm = None
+        self.pretrain = pretrain
+        self.pretrained = False
 
     def call(self, x):
         mu, logvar = self.encoder(x)
@@ -111,8 +126,26 @@ class VariationalDeepEmbedding(VariationalAutoEncoder):
 
     def vade_loss(self, inputs):
         mu, logvar, z = inputs
-        loss = 0
-        return loss
+        p_c = self.pi_prior
+        gamma = self.compute_gamma(z)
+        h = tf.expand_dims(tf.exp(logvar), axis=1) + tf.pow(tf.expand_dims(mu, axis=1) - self.mu_prior, 2)
+        h = tf.reduce_sum(self.logvar_prior + h / tf.exp(self.logvar_prior), axis=2)
+        log_p_z_given_c = 0.5 * tf.reduce_sum(gamma * h)
+        log_p_c = tf.reduce_sum(gamma * tf.math.log(p_c + 1e-10))
+        log_q_c_given_x = tf.reduce_sum(gamma * tf.math.log(gamma + 1e-10))
+        log_q_z_given_x = 0.5 * tf.reduce_sum(1 + logvar)
+
+        loss = log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x
+
+        return loss / tf.shape(z)[0]
+
+    def compute_gamma(self, z):
+        p_c = self.pi_prior
+        h = tf.pow(tf.expand_dims(z, axis=1) - self.mu_prior, 2) /  tf.exp(self.logvar_prior)
+        h += self.logvar_prior
+        h += tf.math.log(np.pi * 2)
+        p_z_c = tf.exp(tf.expand_dims(tf.math.log(p_c + 1e-10), axis=0) - 0.5 * tf.reduce_sum(h, axis=2)) + 1e-10
+        return p_z_c / tf.reduce_sum(p_z_c, axis=1, keep_dims=True)
 
     def fit(self, X, *args):
         if self.gmm:
@@ -125,11 +158,47 @@ class VariationalDeepEmbedding(VariationalAutoEncoder):
     def fit_gmm(self, X):
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
         self.gmm.fit(X)
-        self.pi_prior = self.gmm.weights_
-        self.mu_prior = self.gmm.means_
-        self.logvar_prior = self.gmm.covariances_
+        self.pi_prior = tf.Variable(self.gmm.weights_)
+        self.mu_prior = tf.Variable(self.gmm.means_)
+        self.logvar_prior = tf.Variable(self.gmm.covariances_)
 
 
+
+class PlotLatentSpace(tf.keras.callbacks.Callback):
+
+    def __init__(self, model, X, c=None, interval=20):
+        self.X = X
+        self.c = c
+        self.model = model
+        self.interval = interval
+
+    def plot(self, epoch, loss=None):
+        z = self.model.encode(self.X)
+        z_tsne = TSNE().fit_transform(z)
+
+        fig, ax = plt.subplots()
+
+        title = 'epoch = {}, loss = {}'.format(epoch, loss)
+        ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=self.c, cmap='rainbow', alpha=0.6)
+        ax.set_title(title)
+        fig.savefig('figures/' + self.model.name + "/epoch_{}.png".format(epoch))
+        plt.close(fig)
+
+    def on_train_begin(self, logs=None):
+        try:
+            os.mkdir('figures/' + self.model.name)
+        except FileExistsError:
+            pass
+
+    def on_train_end(self, logs=None):
+        self.plot(self, 'last', logs['loss'])
+    def on_epoch_end(self, epoch, logs=None):
+        
+        if epoch % self.interval == 0:
+            self.plot(epoch, logs['loss'])
+
+    
+            
 
 
 
