@@ -273,4 +273,4 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         for i in range(len(y_pred)):
             w[y_pred[i], y_true[i]] += 1
         ind = linear_sum_assignment(w.max() - w)
-        return sum([w[i,j] for i,j in ind])*1.0/len(y_pred)*100, w
+        return sum([w[i,j] for i,j in zip(*ind)])*1.0/len(y_pred)*100, w
