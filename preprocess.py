@@ -7,7 +7,8 @@ from sklearn.model_selection import train_test_split
 class GSE:
 
     sep_tumor = {
-        'GSE57872': lambda i: i.split('_')[0]
+        'GSE57872': lambda i: i.split('_')[0],
+        'GSE70630': lambda i: i.split('_')[0]
     }
 
     def __init__(self, name='GSE57872'):
