@@ -185,6 +185,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
             self.pretrain = False
         if self.gmm:
             history = super(VariationalDeepEmbedding, self).fit(X, y, **kwargs)
+            print(history)
             return history
         else:
             print('Fitting GMM')
