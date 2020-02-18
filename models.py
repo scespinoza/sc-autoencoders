@@ -187,12 +187,13 @@ class VariationalDeepEmbedding(tf.keras.Model):
             print('Training VaDE')
             history = super(VariationalDeepEmbedding, self).fit(X, y, **kwargs)
             print(history)
-            return history
+            
         else:
             print('Fitting GMM')
             z, _ = self.autoencoder.encoder(X)
             self.fit_gmm(z.numpy())
             self.fit(X, y, **kwargs)
+        return history
 
     def load_pretrained(self):
         self.autoencoder.build(input_shape=(None, self.original_dim))
