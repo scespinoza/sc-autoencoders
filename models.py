@@ -227,8 +227,9 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             predicted_cluster = self.model.predict_cluster(self.X)
             ax[1].scatter(z_tsne[:, 0], z_tsne[:, 1], c=predicted_cluster, cmap='rainbow', alpha=0.6)
             ax[1].set_title('predicted_cluster')
-            fig.savefig('figures/' + self.model.name + "/epoch_{}.png".format(epoch))
             fig.suptitle(title)
+            fig.savefig('figures/' + self.model.name + "/epoch_{}.png".format(epoch))
+            
             plt.close(fig)
         else:
             fig, ax = plt.subplots()
