@@ -183,20 +183,20 @@ class VariationalDeepEmbedding(tf.keras.Model):
             self.autoencoder.fit(X, X, epochs=30)
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
-            z, _ = self.autoencoder.encoder(X)
-            self.fit_gmm(z.numpy())
+
+        z, _ = self.autoencoder.encoder(X)
+        self.fit_gmm(z.numpy())
             
         
         print('Training VaDE')
         history = super(VariationalDeepEmbedding, self).fit(X, y, **kwargs)
+        print(history)
         return history
             
 
     def load_pretrained(self):
         self.autoencoder.build(input_shape=(None, self.original_dim))
         self.autoencoder.load_weights('weights/' + self.name + '_pretrained.h5')
-        z, _ = self.autoencoder.encoder(X)
-        self.fit_gmm(z.numpy())
 
     def fit_gmm(self, X):
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
