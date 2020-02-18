@@ -65,5 +65,14 @@ if __name__ == '__main__':
     model.compile(optimizer=optimizer, loss=loss)
 
     print("Training model: " + name)
-    model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-            callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy])
+    history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
+                callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy])
+
+    training_loss = history.history['loss']
+    validation_loss = history.history['val_loss']
+
+    plt.plot(training_loss, label='training loss')
+    plt.plot(validation, label='validation loss')
+
+    plt.savefig('figures/' + name + '/history.png')
+    plt.close()
