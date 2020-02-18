@@ -158,7 +158,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
         log_q_z_given_x = 0.5 * tf.reduce_sum(1 + logvar)
 
         loss = log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x
-        return loss 
+        return loss
 
     def compute_gamma(self, z):
         p_c = self.pi_prior
