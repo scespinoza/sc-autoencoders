@@ -267,7 +267,7 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         print('Acc: {:.2f}'.format(acc))
 
     def compute_accuracy(self, y_true, y_pred):
-        D = max(tf.max(y_pred), tf.max(y_true) )+1
+        D = max(max(y_pred), max(y_true))+1
         w = np.zeros((D,D), dtype=np.int64)
         for i in range(len(y_pred)):
             w[y_pred[i], y_true[i]] += 1
