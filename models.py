@@ -154,6 +154,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
 
     def vade_loss(self, inputs):
         mu, logvar, z = inputs
+        print(z)
         p_c = self.pi_prior
         gamma = self.compute_gamma(z)
         h = tf.expand_dims(tf.exp(logvar), axis=1) + tf.pow(tf.expand_dims(mu, axis=1) - self.mu_prior, 2)
