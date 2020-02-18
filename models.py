@@ -261,7 +261,7 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         self.y = y
 
     def on_epoch_end(self, epoch, logs=None):
-        y_pred = self.model.predict_clusters(self.x)
+        y_pred = self.model.predict_cluster(self.x)
         y_true = self.y
         acc, w = self.compute_accuracy(y_true, y_pred)
         print('Acc: {:.2f}'.format(acc))
