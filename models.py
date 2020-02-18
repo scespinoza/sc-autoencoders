@@ -153,6 +153,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
     def reconstruction_loss(self, x, x_hat):
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
 
+    @tf.function
     def vade_loss(self, inputs):
         mu, logvar, z = inputs
         p_c = self.pi_prior
@@ -165,7 +166,8 @@ class VariationalDeepEmbedding(tf.keras.Model):
         log_q_z_given_x = 0.5 * tf.reduce_sum(1 + logvar)
 
         loss = log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x
-        return tf.math.divide(loss, float(z.shape[0]))
+        n = z.shape[0] or 1
+        return tf.math.divide(loss, n)
 
     def compute_gamma(self, z):
         p_c = self.pi_prior
