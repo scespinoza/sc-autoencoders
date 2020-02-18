@@ -64,4 +64,4 @@ if __name__ == '__main__':
 
     print("Training model: " + name)
     model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-            callbacks=[early_stopping, plot_latent, model_checkpoint])
+            callbacks=[early_stopping, plot_latent, model_checkpoint], metrics=[model.custom_accuracy()])

@@ -8,6 +8,7 @@ from tensorflow.keras import initializers
 
 from sklearn.mixture import GaussianMixture
 from sklearn.manifold import TSNE
+from sklearn.utils.linear_assignment_ import linear_assignment
 
 import matplotlib.pyplot as plt
 
@@ -199,6 +200,20 @@ class VariationalDeepEmbedding(tf.keras.Model):
         self.pi_prior.assign(self.gmm.weights_)
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(self.gmm.covariances_)
+
+    def custom_accuracy(self, x, y):
+        def accuracy(x, x_hat):
+            y_pred = self.predict_cluster(x)
+            D = max(y_pred.max(), y.max())+1
+            w = np.zeros((D,D), dtype=np.int64)
+            for i in range(pred.size):
+                w[pred[i], real[i]] += 1
+            ind = linear_assignment(w.max() - w)
+            return sum([w[i,j] for i,j in ind])*1.0/pred.size*100, w
+
+    return accuracy
+
+
 
         
 
