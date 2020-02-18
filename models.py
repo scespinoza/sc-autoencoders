@@ -9,6 +9,7 @@ from tensorflow.keras import initializers
 from sklearn.mixture import GaussianMixture
 from sklearn.manifold import TSNE
 from sklearn.utils.linear_assignment_ import linear_assignment
+from scipy.optimize import linear_sum_assignment
 
 import matplotlib.pyplot as plt
 
@@ -271,5 +272,5 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         w = np.zeros((D,D), dtype=np.int64)
         for i in range(len(y_pred)):
             w[y_pred[i], y_true[i]] += 1
-        ind = linear_assignment(w.max() - w)
+        ind = linear_sum_assignment(w.max() - w)
         return sum([w[i,j] for i,j in ind])*1.0/len(y_pred)*100, w
