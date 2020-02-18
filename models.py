@@ -184,6 +184,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
         if self.gmm:
+            print('Training VaDE')
             history = super(VariationalDeepEmbedding, self).fit(X, y, **kwargs)
             print(history)
             return history
