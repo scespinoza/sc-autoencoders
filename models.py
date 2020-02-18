@@ -136,7 +136,6 @@ class VariationalDeepEmbedding(tf.keras.Model):
     def call(self, x):
         mu, logvar = self.autoencoder.encoder(x)
         z = self.sampling([mu, logvar])
-        print(z)
         kl_loss = self.vade_loss([mu, logvar, z])
         self.add_loss(kl_loss)
         return self.autoencoder.decoder(z)
@@ -155,7 +154,6 @@ class VariationalDeepEmbedding(tf.keras.Model):
 
     def vade_loss(self, inputs):
         mu, logvar, z = inputs
-        print(z)
         p_c = self.pi_prior
         gamma = self.compute_gamma(z)
         h = tf.expand_dims(tf.exp(logvar), axis=1) + tf.pow(tf.expand_dims(mu, axis=1) - self.mu_prior, 2)
@@ -263,7 +261,7 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         self.y = y
 
     def on_epoch_end(self, epoch, logs=None):
-        y_pred = self.model.predict_cluster(x)
+        y_pred = self.model.predict_clusters(self.x)
         y_true = self.y
         acc, w = self.compute_accuracy(y_true, y_pred)
         print('Acc: {:.2f}'.format(acc))
