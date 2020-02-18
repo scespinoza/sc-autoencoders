@@ -73,6 +73,6 @@ if __name__ == '__main__':
 
     plt.plot(training_loss, label='training loss')
     plt.plot(validation_loss, label='validation loss')
-
+    plt.title('Learning Curves')
     plt.savefig('figures/' + name + '/history.png')
     plt.close()
