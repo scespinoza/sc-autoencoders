@@ -135,6 +135,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
     def call(self, x):
         mu, logvar = self.autoencoder.encoder(x)
         z = self.sampling([mu, logvar])
+        print(z)
         kl_loss = self.vade_loss([mu, logvar, z])
         self.add_loss(kl_loss)
         return self.autoencoder.decoder(z)
