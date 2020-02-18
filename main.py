@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # callbacks
     early_stopping = callbacks.EarlyStopping(patience=args.patience)
-    model_checkpoint = callbacks.ModelCheckpoint('weights/' + self.name + '_trained.h5',
+    model_checkpoint = callbacks.ModelCheckpoint('weights/' + name + '_trained.h5',
                                                  save_best_only=True,
                                                  save_weights_only=True)
     plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.tumor_labels, interval=args.interval)
