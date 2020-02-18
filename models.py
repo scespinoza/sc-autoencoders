@@ -211,7 +211,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
             ind = linear_assignment(w.max() - w)
             return sum([w[i,j] for i,j in ind])*1.0/pred.size*100, w
 
-    return accuracy
+        return accuracy
 
 
 
