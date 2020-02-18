@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     # callbacks
     early_stopping = callbacks.EarlyStopping(patience=args.patience)
-    model_checkpoint = callbacks.ModelCheckPoint('weights/' + self.name + '_trained.h5',
+    model_checkpoint = callbacks.ModelCheckpoint('weights/' + self.name + '_trained.h5',
                                                  save_best_only=True,
                                                  save_weights_only=True)
     plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.tumor_labels, interval=args.interval)
@@ -64,4 +64,4 @@ if __name__ == '__main__':
 
     print("Training model: " + name)
     model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-            callbacks=[early_stopping, plot_latent])
+            callbacks=[early_stopping, plot_latent, model_checkpoint])
