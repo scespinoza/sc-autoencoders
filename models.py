@@ -125,7 +125,12 @@ class VariationalDeepEmbedding(tf.keras.Model):
         self.sampling = SamplingLayer()
 
         if not pretrain:
-            self.load_pretrained()
+            try:
+                self.load_pretrained()
+            except OSError:
+                print("Weights for {} not found.".format(self.name))
+                print("Enabling pretrain")
+                self.pretrain=True
 
     def call(self, x):
         mu, logvar = self.autoencoder.encoder(x)
