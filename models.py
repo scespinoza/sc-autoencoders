@@ -201,17 +201,6 @@ class VariationalDeepEmbedding(tf.keras.Model):
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(self.gmm.covariances_)
 
-    def custom_accuracy(self, x, y):
-        def accuracy(x, x_hat):
-            y_pred = self.predict_cluster(x)
-            D = max(y_pred.max(), y.max())+1
-            w = np.zeros((D,D), dtype=np.int64)
-            for i in range(pred.size):
-                w[pred[i], real[i]] += 1
-            ind = linear_assignment(w.max() - w)
-            return sum([w[i,j] for i,j in ind])*1.0/pred.size*100, w
-
-        return accuracy
 
 
 
@@ -266,6 +255,23 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
 
     
             
+class ComputeAccuracy(tf.keras.callbacks.Callback):
 
+    def __init__(self, model, x, y):
+        self.model = model
+        self.x = x
+        self.y = y
 
+    def on_epoch_end(self, epoch, logs=None):
+        y_pred = self.model.predict_cluster(x)
+        y_true = self.y
+        acc, w = self.compute_accuracy(y_true, y_pred)
+        print('Acc: {:.2f}'.format(acc))
 
+    def compute_accuracy(y_true, y_pred):
+        D = max(y_pred.max(), y_true.max())+1
+        w = np.zeros((D,D), dtype=np.int64)
+        for i in range(len(y_pred)):
+            w[y_pred[i], y_true[i]] += 1
+        ind = linear_assignment(w.max() - w)
+        return sum([w[i,j] for i,j in ind])*1.0/len(y_pred)*100, w

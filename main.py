@@ -2,7 +2,7 @@ import argparse
 from tensorflow.keras import optimizers
 from tensorflow.keras import callbacks
 from preprocess import GSE
-from models import AutoEncoder, VariationalAutoEncoder, VariationalDeepEmbedding, PlotLatentSpace
+from models import *
 
 
 models_dict = {
@@ -59,9 +59,11 @@ if __name__ == '__main__':
     model_checkpoint = callbacks.ModelCheckpoint('weights/' + name + '_trained.h5',
                                                  save_best_only=True,
                                                  save_weights_only=True)
+
+    accuracy = ComputeAccuracy(model, dataset.data_scaled, dataset.tumor_labels)
     plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.tumor_labels, interval=args.interval)
     model.compile(optimizer=optimizer, loss=loss)
 
     print("Training model: " + name)
     model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-            callbacks=[early_stopping, plot_latent, model_checkpoint], metrics=[model.custom_accuracy()])
+            callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy])
