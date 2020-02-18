@@ -130,7 +130,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
             except OSError:
                 print("Weights for {} not found.".format(self.name))
                 print("Enabling pretrain")
-                self.pretrain=True
+                pretrain = True
 
     def call(self, x):
         mu, logvar = self.autoencoder.encoder(x)
