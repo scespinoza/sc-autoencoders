@@ -7,3 +7,4 @@ weights
 tmp
 models
 results
+figures/*
