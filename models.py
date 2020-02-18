@@ -265,7 +265,7 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         y_pred = self.model.predict_cluster(self.x)
         y_true = self.y
         acc, w = self.compute_accuracy(y_true, y_pred)
-        print('Acc: {:.2f}'.format(acc))
+        print(', Acc: {:.2f}'.format(acc))
 
     def compute_accuracy(self, y_true, y_pred):
         D = max(max(y_pred), max(y_true))+1
