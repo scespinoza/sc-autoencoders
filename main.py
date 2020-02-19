@@ -76,7 +76,8 @@ if __name__ == '__main__':
 
     print(len(history.history['loss']))
     print(len(history.history['test_metric']))
-    pd.DataFrame.from_dict(history).to_csv('results/' + self.name + '_history.csv', index=False)
+    history_df = pd.DataFrame.from_dict(history)
+    history_df.to_csv('results/' + self.name + '_history.csv', index=False)
     training_loss = history.history['loss']
     validation_loss = history.history['val_loss']
 
