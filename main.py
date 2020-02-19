@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     
     def scheduler(epoch):
-        return args.lr * (0.9 ** (epochs // 10))
+        return args.lr * (0.9 ** (epoch // 10))
 
     lr_scheduler = callbacks.LearningRateScheduler(scheduler)
     accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.tumor_labels)
