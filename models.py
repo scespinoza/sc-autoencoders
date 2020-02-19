@@ -21,7 +21,7 @@ class Encoder(layers.Layer):
         self.h1 = layers.Dense(2048, activation='relu')
         self.h2 = layers.Dense(512, activation='relu')
         self.mu_dense = layers.Dense(latent_dim, activation='linear')
-        self.logvar_dense = layers.Dense(latent_dim, activation='linear')
+        self.logvar_dense = layers.Dense(latent_dim, activation='linear', kernel_initializer='zeros')
 
     def call(self, x):
         x = self.h1(x)
@@ -162,9 +162,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
         p_c = self.pi_prior
         gamma = self.compute_gamma(z)
         h = tf.expand_dims(tf.exp(logvar), axis=1) + tf.pow(tf.expand_dims(mu, axis=1) - self.mu_prior, 2)
-        print(tf.shape(h))
         h = tf.reduce_sum(self.logvar_prior + h / tf.exp(self.logvar_prior), axis=2)
-        print(tf.shape(h))
         log_p_z_given_c = 0.5 * tf.reduce_sum(gamma * h, axis=1)
         log_p_c = tf.reduce_sum(gamma * tf.math.log(p_c + 1e-10), axis=1)
         log_q_c_given_x = tf.reduce_sum(gamma * tf.math.log(gamma + 1e-10), axis=1)
