@@ -218,7 +218,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
 
     def plot(self, epoch, loss=None):
         z = self.model.encode(self.X)
-        z = np.concatenate([z, self.model.mu_prior], axis=0)
+        z = np.concatenate([z, self.model.mu_prior.numpy()], axis=0)
         z_tsne = TSNE().fit_transform(z)
 
         cluster_means = z_tsne[-6:]
