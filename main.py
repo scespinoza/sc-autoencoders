@@ -74,9 +74,7 @@ if __name__ == '__main__':
     history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
                 callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy], verbose=args.verbose)
 
-    print(len(history.history['loss']))
-    print(len(history.history['test_metric']))
-    history_df = pd.DataFrame.from_dict(history)
+    history_df = pd.DataFrame.from_dict(history.history)
     history_df.to_csv('results/' + self.name + '_history.csv', index=False)
     training_loss = history.history['loss']
     validation_loss = history.history['val_loss']
