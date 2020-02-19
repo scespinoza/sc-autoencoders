@@ -286,8 +286,8 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         #print('gamma: ', gamma)
         log_p_z_given_c = -0.5 * tf.reduce_sum(tf.math.log(2 * np.pi) + self.model.logvar_prior + \
                                  ((self.model.mu_prior - z) ** 2) / tf.exp(self.model.logvar_prior), axis=1)
-        print('log p(z|c): ', np.exp(log_p_z_given_c.numpy()))
-        print('gamma: ', gamma)
+        print('log p(c)p(z|c): ', np.exp(tf.expand_dims(tf.math.log(p_c + 1e-10), axis=0) + log_p_z_given_c))
+        #print('gamma: ', gamma)
 
 
     def compute_accuracy(self, y_true, y_pred):
