@@ -75,7 +75,7 @@ if __name__ == '__main__':
                 callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy], verbose=args.verbose)
 
     history_df = pd.DataFrame.from_dict(history.history)
-    history_df.to_csv('results/' + self.name + '_history.csv', index=False)
+    history_df.to_csv('results/' + name + '_history.csv', index=False)
     training_loss = history.history['loss']
     validation_loss = history.history['val_loss']
 
