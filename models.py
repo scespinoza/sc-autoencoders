@@ -284,7 +284,8 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         #print('z: ', z.numpy())
         gamma = self.model.compute_gamma(z)
         print('gamma: ', gamma.numpy())
-        print((z[:, np.newaxis, :] - self.model.mu_prior.numpy()) ** 2)
+        h = (z[:, np.newaxis, :] - self.model.mu_prior.numpy()) ** 2 / np.exp(self.model.logvar_prior.numpy())
+        print(h)
 
     def compute_accuracy(self, y_true, y_pred):
         D = max(max(y_pred), max(y_true))+1
