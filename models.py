@@ -193,7 +193,6 @@ class VariationalDeepEmbedding(tf.keras.Model):
         
         print('Training VaDE')
         history = super(VariationalDeepEmbedding, self).fit(X, y, **kwargs)
-        print(history.history)
         return history
             
 
@@ -281,7 +280,7 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         loss = logs['loss']
         val_loss = logs['val_loss']
         print('Epoch: {}, loss: {:.2f}, val_loss: {:.2f}, Acc: {:.2f}'.format(epoch, loss, val_loss, acc))
-        print(self.model.pi_prior.numpy())
+        plt.plot(model.mu_prior)
 
     def compute_accuracy(self, y_true, y_pred):
         D = max(max(y_pred), max(y_true))+1
