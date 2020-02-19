@@ -57,7 +57,7 @@ if __name__ == '__main__':
                                         latent_dim=args.latent,
                                         name=name)
     optimizer = optimizers.Adam(learning_rate=args.lr)
-    loss = model.reconstruction_loss
+    loss = lambda x, x_hat: 0.
 
 
     # callbacks
