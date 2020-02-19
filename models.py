@@ -207,7 +207,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
     def fit_gmm(self, X):
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
         self.gmm.fit(X)
-        #self.pi_prior.assign(self.gmm.weights_)
+        self.pi_prior.assign(self.gmm.weights_)
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
 
