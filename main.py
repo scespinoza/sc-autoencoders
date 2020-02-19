@@ -66,13 +66,18 @@ if __name__ == '__main__':
                                                  save_best_only=True,
                                                  save_weights_only=True)
 
+    
+    def scheduler(epoch):
+        return args.lr * (0.9 ** (epochs // 10))
+
+    lr_scheduler = callbacks.LearningRateScheduler(scheduler)
     accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.tumor_labels)
     plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.tumor_labels, interval=args.interval)
     model.compile(optimizer=optimizer, loss=loss)
 
     print("Training model: " + name)
     history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-                callbacks=[early_stopping, accuracy, plot_latent, model_checkpoint], verbose=args.verbose)
+                callbacks=[early_stopping, lr_scheduler, accuracy, plot_latent, model_checkpoint], verbose=args.verbose)
 
     history_df = pd.DataFrame.from_dict(history.history)
     history_df.to_csv('results/' + name + '_history.csv', index=False, sep='\t')
