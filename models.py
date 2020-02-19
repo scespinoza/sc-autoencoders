@@ -206,7 +206,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
         self.pi_prior.assign(self.gmm.weights_)
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
-        #print(self.pi_prior)
+        print(self.pi_prior)
 
 
 
