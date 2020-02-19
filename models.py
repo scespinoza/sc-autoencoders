@@ -21,7 +21,7 @@ class Encoder(layers.Layer):
         self.h1 = layers.Dense(2048, activation='relu')
         self.h2 = layers.Dense(512, activation='relu')
         self.mu_dense = layers.Dense(latent_dim, activation='linear')
-        self.logvar_dense = layers.Dense(latent_dim, activation='linear', kernel_initializer='zeros')
+        self.logvar_dense = layers.Dense(latent_dim, activation='linear')
 
     def call(self, x):
         x = self.h1(x)
@@ -207,7 +207,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
     def fit_gmm(self, X):
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
         self.gmm.fit(X)
-        self.pi_prior.assign(self.gmm.weights_)
+        #self.pi_prior.assign(self.gmm.weights_)
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
 
