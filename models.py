@@ -279,6 +279,7 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         acc, w = self.compute_accuracy(y_true, y_pred)
         logs['test_metric'] = acc
         print('Epoch: {}, Acc: {}'.format(epoch, acc))
+        print(self.model.pi_prior.numpy())
 
     def compute_accuracy(self, y_true, y_pred):
         D = max(max(y_pred), max(y_true))+1
