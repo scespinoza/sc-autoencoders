@@ -280,7 +280,10 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         loss = logs['loss']
         val_loss = logs['val_loss']
         print('Epoch: {}, loss: {:.2f}, val_loss: {:.2f}, Acc: {:.2f}'.format(epoch, loss, val_loss, acc))
-        print(self.model.logvar_prior.numpy())
+        z = self.model.encode(x[:1])
+        print(z)
+        gamma = self.model.compute_gamma(z)
+        print(gamma)
 
     def compute_accuracy(self, y_true, y_pred):
         D = max(max(y_pred), max(y_true))+1
