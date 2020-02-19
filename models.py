@@ -218,8 +218,11 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
 
     def plot(self, epoch, loss=None):
         z = self.model.encode(self.X)
-
+        z = np.concatenate([z, self.model.mu_prior], axis=0)
         z_tsne = TSNE().fit_transform(z)
+
+        cluster_means = z_tsne[-6:]
+        z_tsne = z_tsne[:-6]
 
         if isinstance(self.model, VariationalDeepEmbedding):
             fig, ax = plt.subplots(1, 2, figsize=(16, 9))
@@ -228,6 +231,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             ax[0].set_title('tumor')
             predicted_cluster = self.model.predict_cluster(self.X)
             ax[1].scatter(z_tsne[:, 0], z_tsne[:, 1], c=predicted_cluster, cmap='rainbow', alpha=0.6)
+            ax[1].scatter(cluster_means[:, 0], cluster_means[:, 1], c='black', s=30)
             ax[1].set_title('predicted_cluster')
             fig.suptitle(title)
             fig.savefig('figures/' + self.model.name + "/epoch_{}.png".format(epoch))
