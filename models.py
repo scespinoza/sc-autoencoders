@@ -276,7 +276,8 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         val_loss = logs['val_loss']
         print('Epoch: {}, loss: {:.2f}, val_loss: {:.2f}, Acc: {:.2f}'.format(epoch, loss, val_loss, acc))
         print('pi: ', self.model.pi_prior.numpy())
-        gamma = self.model.compute_gamma(self.x[:1]).numpy()
+        z =self.model(x[:1])
+        gamma = self.model.compute_gamma(z).numpy()
         print('gamma: ', gamma)
 
 
