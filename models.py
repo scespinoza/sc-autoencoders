@@ -285,7 +285,9 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         z = self.model.encode(self.x[:1])
         #print('z: ', z.numpy())
         gamma = self.model.compute_gamma(z)
+
         print('gamma: ', gamma.numpy())
+        """
         h = (z[:, np.newaxis, :] - self.model.mu_prior.numpy()) ** 2 / np.exp(self.model.logvar_prior.numpy())
         h += self.model.logvar_prior.numpy()
         h += np.log(np.pi * 2)
