@@ -175,7 +175,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
 
         p_c = self.pi_prior
         #print(p_c)
-        h = (tf.expand_dims(z, axis=1) - self.mu_prior)  ** 2 /  tf.exp(self.logvar_prior)
+        h = ((tf.expand_dims(z, axis=1) - self.mu_prior)  ** 2) /  tf.exp(self.logvar_prior)
         h += self.logvar_prior
         h += tf.math.log(np.pi * 2)
         p_z_c = tf.exp(tf.expand_dims(tf.math.log(p_c + 1e-10), axis=0) - 0.5 * tf.reduce_sum(h, axis=2)) + 1e-10
