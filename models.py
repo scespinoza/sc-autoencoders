@@ -184,7 +184,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
     def fit(self, X, y, **kwargs):
         if self.pretrain:
             self.autoencoder.compile(optimizer=optimizers.Adam(0.0001), loss='binary_crossentropy')
-            self.autoencoder.fit(X, X, epochs=50)
+            self.autoencoder.fit(X, X, epochs=self.pretrain)
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
         print("Fitting GMM")
@@ -285,9 +285,6 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
 
         # debugg gamma
 
-        print('pi: ', self.model.pi_prior.numpy())
-        print('mu: ', self.model.mu_prior.numpy())
-        print('logvar: ', self.model.logvar_prior.numpy())
         """
         h = (z[:, np.newaxis, :] - self.model.mu_prior.numpy()) ** 2 / np.exp(self.model.logvar_prior.numpy())
         h += self.model.logvar_prior.numpy()

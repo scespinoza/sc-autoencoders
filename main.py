@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--patience', type=int, default=30, help='patience for early stopping')
     parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')
     parser.add_argument('--model', type=str, default='vade', help='model to train')
-    parser.add_argument('--pretrain', action='store_true', help='pretrain vade')
+    parser.add_argument('--pretrain', type=int, default=0, help='pretrain vade')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--components', type=int, default=6, help='GMM components')
 
