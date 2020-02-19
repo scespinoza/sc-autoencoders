@@ -163,17 +163,17 @@ class VariationalDeepEmbedding(tf.keras.Model):
         gamma = self.compute_gamma(z)
         h = tf.expand_dims(tf.exp(logvar), axis=1) + tf.pow(tf.expand_dims(mu, axis=1) - self.mu_prior, 2)
         h = tf.reduce_sum(self.logvar_prior + h / tf.exp(self.logvar_prior), axis=2)
-        log_p_z_given_c = 0.5 * tf.reduce_mean(gamma * h)
-        log_p_c = tf.reduce_mean(gamma * tf.math.log(p_c + 1e-10))
-        log_q_c_given_x = tf.reduce_mean(gamma * tf.math.log(gamma + 1e-10))
-        log_q_z_given_x = 0.5 * tf.reduce_mean(1 + logvar)
+        log_p_z_given_c = 0.5 * tf.reduce_mean(gamma * h, axis=0)
+        log_p_c = tf.reduce_mean(gamma * tf.math.log(p_c + 1e-10), axis=0)
+        log_q_c_given_x = tf.reduce_mean(gamma * tf.math.log(gamma + 1e-10), axis=0)
+        log_q_z_given_x = 0.5 * tf.reduce_mean(1 + logvar, axis=0)
 
         loss = log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x
         
         return loss
 
     def compute_gamma(self, z):
-        
+
         p_c = self.pi_prior
         #print(p_c)
         h = tf.pow(tf.expand_dims(z, axis=1) - self.mu_prior, 2) /  tf.exp(self.logvar_prior)
