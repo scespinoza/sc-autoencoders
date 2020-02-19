@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     print("Training model: " + name)
     history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-                callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy], verbose=args.verbose)
+                callbacks=[early_stopping, accuracy, plot_latent, model_checkpoint], verbose=args.verbose)
 
     history_df = pd.DataFrame.from_dict(history.history)
     history_df.to_csv('results/' + name + '_history.csv', index=False, sep='\t')
