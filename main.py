@@ -1,9 +1,11 @@
 import argparse
+import warnings
 from tensorflow.keras import optimizers
 from tensorflow.keras import callbacks
 from preprocess import GSE
 from models import *
 
+warnings.filterwarnings("ignore")
 
 models_dict = {
     'stacked': AutoEncoder,
@@ -24,6 +26,8 @@ if __name__ == '__main__':
     parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')
     parser.add_argument('--model', type=str, default='vade', help='model to train')
     parser.add_argument('--pretrain', action='store_true', help='pretrain vade')
+    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--components', type=int, default=6, help='GMM components')
 
     args = parser.parse_args()
 
@@ -44,6 +48,7 @@ if __name__ == '__main__':
     if args.model == 'vade':
         model = models_dict[args.model](original_dim=dataset.n_genes, 
                                         latent_dim=args.latent, 
+                                        n_components=args.components,
                                         pretrain=args.pretrain,
                                         name=name)
     else:
@@ -66,7 +71,7 @@ if __name__ == '__main__':
 
     print("Training model: " + name)
     history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-                callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy])
+                callbacks=[early_stopping, plot_latent, model_checkpoint, accuracy], verbose=args.verbose)
 
     training_loss = history.history['loss']
     validation_loss = history.history['val_loss']
@@ -76,3 +81,7 @@ if __name__ == '__main__':
     plt.title('Learning Curves')
     plt.savefig('figures/' + name + '/history.png')
     plt.close()
+
+    plt.plot(history.history['test_metric'])
+    plt.title('Accuracy')
+    plt.savefig('figures/' + name + '/accuracy.png')
