@@ -265,7 +265,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
 
     
             
-class ComputeAccuracy(tf.keras.callbacks.Callback):
+class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
 
     def __init__(self, model, x, y):
         self.model = model
@@ -278,7 +278,9 @@ class ComputeAccuracy(tf.keras.callbacks.Callback):
         y_true = self.y
         acc, w = self.compute_accuracy(y_true, y_pred)
         logs['test_metric'] = acc
-        print('Epoch: {}, Acc: {}'.format(epoch, acc))
+        loss = logs['loss']
+        val_loss = logs['val_loss']
+        print('Epoch: {}, loss: {}, val_loss: {}, Acc: {}'.format(epoch, loss, val_loss, acc))
         print(self.model.pi_prior.numpy())
 
     def compute_accuracy(self, y_true, y_pred):

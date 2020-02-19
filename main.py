@@ -66,7 +66,7 @@ if __name__ == '__main__':
                                                  save_best_only=True,
                                                  save_weights_only=True)
 
-    accuracy = ComputeAccuracy(model, dataset.data_scaled, dataset.tumor_labels)
+    accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.tumor_labels)
     plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.tumor_labels, interval=args.interval)
     model.compile(optimizer=optimizer, loss=loss)
 
