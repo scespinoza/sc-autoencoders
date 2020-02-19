@@ -290,7 +290,7 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         h = h.numpy().sum(axis=2)
         h = np.log(self.model.pi_prior.numpy())[np.newaxis, :] - 0.5 * h
         p_z_c = tf.exp(h) + 1e-10
-        print(p_z_c)
+        print(p_z_c / p_z_c.sum(1, keepdims=True))
 
     def compute_accuracy(self, y_true, y_pred):
         D = max(max(y_pred), max(y_true))+1
