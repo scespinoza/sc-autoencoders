@@ -207,6 +207,8 @@ class VariationalDeepEmbedding(tf.keras.Model):
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
         print(self.pi_prior)
+        print(self.mu_prior)
+        print(self.logvar_prior)
 
 
 
@@ -284,6 +286,8 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         # debugg gamma
 
         print('pi: ', self.model.pi_prior.numpy())
+        print('mu: ', self.model.mu_prior.numpy())
+        print('logvar: ', self.model.logvar_prior.numpy())
         """
         h = (z[:, np.newaxis, :] - self.model.mu_prior.numpy()) ** 2 / np.exp(self.model.logvar_prior.numpy())
         h += self.model.logvar_prior.numpy()
