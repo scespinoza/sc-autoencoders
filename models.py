@@ -168,6 +168,11 @@ class VariationalDeepEmbedding(tf.keras.Model):
         log_q_c_given_x = tf.reduce_mean(gamma * tf.math.log(gamma + 1e-10), axis=0)
         log_q_z_given_x = 0.5 * tf.reduce_mean(1 + logvar, axis=0)
 
+        print(log_p_z_given_c
+        print(log_p_c)
+        print(log_q_c_given_x)
+        print(log_q_z_given_x)
+        
         loss = log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x
         
         return loss
