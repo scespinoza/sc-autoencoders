@@ -23,26 +23,7 @@ losses = {
 }
 
 
-if __name__ == '__main__':
-    tf.keras.backend.set_floatx('float32')
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='GSE57872', help='dataset to train')
-    parser.add_argument('--split', action='store_true', help='split dataset on train/test')
-    parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
-    parser.add_argument('--epochs', type=int, default=500, help='epochs')
-    parser.add_argument('--latent', type=int, default=10, help='latent dimensions')
-    parser.add_argument('--patience', type=int, default=30, help='patience for early stopping')
-    parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')
-    parser.add_argument('--model', type=str, default='vade', help='model to train')
-    parser.add_argument('--pretrain', type=int, default=0, help='pretrain vade')
-    parser.add_argument('--pretrain_lr', type=float, default=3e-4, help='pretrain_lr')
-    parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('--components', type=int, default=0, help='GMM components')
-    parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
-    parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
-
-    args = parser.parse_args()
-
+def load_data(args):
     if args.model == 'vade' and args.dataset in ['GSE57872', 'GSE84465']:
         assert args.class_name != '', "Must provide a class name."
 
@@ -65,7 +46,13 @@ if __name__ == '__main__':
     else:
         n_components = args.components
 
-    
+    return (x_train, x_test), (y_train, y_test), n_components
+
+def train_model(args):
+
+    name = args.dataset + '_' + args.class_name + '_' + args.model
+    x, y, n_components = load_data(args)
+
     if args.model == 'vade':
         model = models_dict[args.model](original_dim=dataset.n_genes, 
                                         latent_dim=args.latent, 
@@ -77,6 +64,8 @@ if __name__ == '__main__':
         model = models_dict[args.model](original_dim=dataset.n_genes,
                                         latent_dim=args.latent,
                                         name=name)
+
+
     optimizer = optimizers.Adam(learning_rate=args.lr)
 
 
@@ -102,11 +91,12 @@ if __name__ == '__main__':
         callbacks = [early_stopping, plot_latent, model_checkpoint]
 
     print("Training model: " + name)
-    history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
+    history = model.fit(x[0], x[0], epochs=args.epochs, validation_data=(x[1], x[1]),
                 callbacks=callbacks, verbose=args.verbose)
+    return history, name
 
 
-    # output plots
+def plot_output(args, history, name):
     history_df = pd.DataFrame.from_dict(history.history)
     history_df.to_csv('results/' + name + '_history.csv', index=False, sep='\t')
     training_loss = history.history['loss']
@@ -122,3 +112,29 @@ if __name__ == '__main__':
         plt.plot(history.history['test_metric'])
         plt.title('Accuracy')
         plt.savefig('figures/' + name + '/accuracy.png')
+
+if __name__ == '__main__':
+    tf.keras.backend.set_floatx('float32')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--dataset', type=str, default='GSE57872', help='dataset to train')
+    parser.add_argument('--split', action='store_true', help='split dataset on train/test')
+    parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
+    parser.add_argument('--epochs', type=int, default=500, help='epochs')
+    parser.add_argument('--latent', type=int, default=10, help='latent dimensions')
+    parser.add_argument('--patience', type=int, default=30, help='patience for early stopping')
+    parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')
+    parser.add_argument('--model', type=str, default='vade', help='model to train')
+    parser.add_argument('--pretrain', type=int, default=0, help='pretrain vade')
+    parser.add_argument('--pretrain_lr', type=float, default=3e-4, help='pretrain_lr')
+    parser.add_argument('--verbose', action='store_true')
+    parser.add_argument('--components', type=int, default=0, help='GMM components')
+    parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
+    parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
+
+    args = parser.parse_args()
+
+    if args.model == 'vade' and args.dataset in ['GSE57872', 'GSE84465']:
+        assert args.class_name != '', "Must provide a class name."
+
+    history, name = train_model(args)
+    plot_output(history, name)
