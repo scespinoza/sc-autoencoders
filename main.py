@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.dataset in ['GSE57872', 'GSE84465']:
+    if args.model == 'vade' and args.dataset in ['GSE57872', 'GSE84465']:
         assert args.class_name != '', "Must provide a class name."
 
     dataset = GSE(name=args.dataset, class_name=args.class_name)
@@ -90,9 +90,14 @@ if __name__ == '__main__':
     plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.class_labels, interval=args.interval)
     model.compile(optimizer=optimizer, loss=loss)
 
+    if args.model == 'vade':
+        callbacks = [early_stopping, lr_scheduler, accuracy, plot_latent, model_checkpoint]
+    else:
+        callbacks = [early_stopping, plot_latent, model_checkpoint]
+
     print("Training model: " + name)
     history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
-                callbacks=[early_stopping, lr_scheduler, accuracy, plot_latent, model_checkpoint], verbose=args.verbose)
+                callbacks=callbacks, verbose=args.verbose)
 
     history_df = pd.DataFrame.from_dict(history.history)
     history_df.to_csv('results/' + name + '_history.csv', index=False, sep='\t')
