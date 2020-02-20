@@ -8,7 +8,7 @@ from models import *
 if __name__ == '__main__':
     data = pd.read_csv('data/mgh26.txt', sep='\t', index_col=0)
     n_cells, n_genes = data.shape
-    name='stacked_mgh26'
+    name='stacked_mgh28'
 
     model = AutoEncoder(original_dim=n_genes, name=name)
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
     metadata = pd.read_csv('data/GSE57872_metadata.txt')
     filter_pop = metadata['Cell_type'].map(lambda n: not 'Population' in n)
-    filter_tumor = metadata['patient_id'] == 'MGH26'
+    filter_tumor = metadata['patient_id'] == 'MGH28'
     classes = LabelEncoder().fit_transform(metadata[filter_tumor & filter_pop]['subtype'].dropna())
     
     plot_latent = PlotLatentSpace(model, data_scaled, classes, interval=20)
