@@ -78,7 +78,7 @@ def train_model(args):
     
     def scheduler(epoch):
         # learning rate scheduler
-        return args.lr * (0.9 ** (epoch // args.lr_interval))
+        return args.lr * (args.decay ** (epoch // args.lr_interval))
 
     lr_scheduler = callbacks.LearningRateScheduler(scheduler)
     accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.class_labels)
@@ -129,6 +129,7 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--components', type=int, default=0, help='GMM components')
     parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
+    parser.add_argument('--decay', type=float, default=0.99)
     parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
 
     args = parser.parse_args()
