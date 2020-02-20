@@ -99,9 +99,10 @@ class VariationalAutoEncoder(AutoEncoder):
         return self.sampling([mu, logvar])
 
     def vae_loss(self, inputs):
-        mu, logvar = inputs
-        loss = -0.5 * (1 + logvar - tf.square(mu) - tf.exp(logvar))
-        return tf.reduce_mean(loss)
+        x, mu, logvar, x_hat = inputs
+        reconstruction_loss = losses.binary_crossentropy(x, x_hat)
+        kl_loss = -0.5 * (1 + logvar - tf.square(mu) - tf.exp(logvar))
+        return tf.reduce_mean(reconstruction_loss + kl_loss)
 
 
 class VariationalDeepEmbedding(tf.keras.Model):

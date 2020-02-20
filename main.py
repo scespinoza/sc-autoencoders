@@ -117,6 +117,7 @@ if __name__ == '__main__':
     plt.savefig('figures/' + name + '/history.png')
     plt.close()
 
-    plt.plot(history.history['test_metric'])
-    plt.title('Accuracy')
-    plt.savefig('figures/' + name + '/accuracy.png')
+    if args.model == 'vade':
+        plt.plot(history.history['test_metric'])
+        plt.title('Accuracy')
+        plt.savefig('figures/' + name + '/accuracy.png')
