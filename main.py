@@ -31,12 +31,16 @@ if __name__ == '__main__':
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--components', type=int, default=0, help='GMM components')
     parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
+    parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
 
     args = parser.parse_args()
 
-    dataset = GSE(name=args.dataset)
+    if args.dataset in ['GSE57872', 'GSE84465']:
+        assert args.class_name != '', "Must provide a class name."
 
-    name = args.dataset + '_' + args.model
+    dataset = GSE(name=args.dataset, class_name=args.class_name)
+
+    name = args.dataset + '_' + args.class_name + '_' + args.model
     
     if args.split:
         x_train, y_train = dataset.train
