@@ -184,7 +184,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
 
     def fit(self, X, y, **kwargs):
         if self.pretrain:
-            self.autoencoder.compile(optimizer=optimizers.Adam(0.0001), loss='binary_crossentropy')
+            self.autoencoder.compile(optimizer=optimizers.Adam(0.001), loss='binary_crossentropy')
             self.autoencoder.fit(X, X, epochs=self.pretrain)
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
