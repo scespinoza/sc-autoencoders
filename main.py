@@ -1,6 +1,7 @@
 import argparse
 import warnings
 import pandas as pd
+import tensorflow as tf
 from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 from tensorflow.keras import callbacks
@@ -23,7 +24,7 @@ losses = {
 
 
 if __name__ == '__main__':
-
+    tf.keras.backend.set_floatx('float32')
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default='GSE57872', help='dataset to train')
     parser.add_argument('--split', action='store_true', help='split dataset on train/test')
