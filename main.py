@@ -1,6 +1,7 @@
 import argparse
 import warnings
 import pandas as pd
+from tensorflow.keras import losses
 from tensorflow.keras import optimizers
 from tensorflow.keras import callbacks
 from preprocess import GSE
@@ -12,6 +13,12 @@ models_dict = {
     'stacked': AutoEncoder,
     'vae': VariationalAutoEncoder,
     'vade': VariationalDeepEmbedding
+}
+
+losses = {
+    'stacked': losses.binary_crossentropy,
+    'vae': lambda x, x_hat: 0.,
+    'vade': lambda x, x_hat: 0.
 }
 
 
@@ -72,8 +79,6 @@ if __name__ == '__main__':
     optimizer = optimizers.Adam(learning_rate=args.lr)
 
 
-    loss = lambda x, x_hat: 0.
-
     # callbacks
     early_stopping = callbacks.EarlyStopping(patience=args.patience)
     model_checkpoint = callbacks.ModelCheckpoint('weights/' + name + '_trained.h5',
@@ -88,7 +93,7 @@ if __name__ == '__main__':
     lr_scheduler = callbacks.LearningRateScheduler(scheduler)
     accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.class_labels)
     plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.class_labels, interval=args.interval)
-    model.compile(optimizer=optimizer, loss=loss)
+    model.compile(optimizer=optimizer, loss=losses[args.model])
 
     if args.model == 'vade':
         callbacks = [early_stopping, lr_scheduler, accuracy, plot_latent, model_checkpoint]
@@ -99,6 +104,8 @@ if __name__ == '__main__':
     history = model.fit(x_train, x_train, epochs=args.epochs, validation_data=(x_test, x_test),
                 callbacks=callbacks, verbose=args.verbose)
 
+
+    # output plots
     history_df = pd.DataFrame.from_dict(history.history)
     history_df.to_csv('results/' + name + '_history.csv', index=False, sep='\t')
     training_loss = history.history['loss']
