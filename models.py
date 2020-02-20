@@ -288,6 +288,7 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         logs['test_metric'] = acc
         loss = logs['loss']
         val_loss = logs['val_loss']
+        print()
         print('Epoch: {}, loss: {:.2f}, val_loss: {:.2f}, Acc: {:.2f}'.format(epoch, loss, val_loss, acc))
         print('pi: ', self.model.pi_prior.numpy())
         z =self.model.encode(self.x[:1])

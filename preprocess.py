@@ -70,7 +70,7 @@ class GSE:
     def test(self):
         return self.x_test, self.y_test
 
-    
+
 if __name__ == '__main__':
     dataset = GSE('GSE84465')
     print(dataset.data.head())
