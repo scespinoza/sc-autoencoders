@@ -86,13 +86,13 @@ def train_model(args):
     model.compile(optimizer=optimizer, loss=losses[args.model])
 
     if args.model == 'vade':
-        callbacks = [early_stopping, lr_scheduler, accuracy, plot_latent, model_checkpoint]
+        callbacks_list = [early_stopping, lr_scheduler, accuracy, plot_latent, model_checkpoint]
     else:
-        callbacks = [early_stopping, plot_latent, model_checkpoint]
+        callbacks_list = [early_stopping, plot_latent, model_checkpoint]
 
     print("Training model: " + name)
     history = model.fit(x[0], x[0], epochs=args.epochs, validation_data=(x[1], x[1]),
-                callbacks=callbacks, verbose=args.verbose)
+                callbacks=callbacks_list, verbose=args.verbose)
     return history, name
 
 
