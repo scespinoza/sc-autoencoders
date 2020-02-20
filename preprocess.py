@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 
 def get_gse84465_metadata(index, column='Cell_type'):
     metadata = pd.read_csv('data/GSE84465_metadata.txt')
+    metadata['cell_id'] = metadata[['plate_id', 'well']].apply(lambda d: str(d[0]) + '.' + str(d[1]), axis=1)
+    metadata.set_index('cell_id')
     return metadata.loc[index, column]
 
 class GSE:

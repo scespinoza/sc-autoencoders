@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     lr_scheduler = callbacks.LearningRateScheduler(scheduler)
     accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.class_labels)
-    plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.classgit_labels, interval=args.interval)
+    plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.class_labels, interval=args.interval)
     model.compile(optimizer=optimizer, loss=loss)
 
     print("Training model: " + name)
