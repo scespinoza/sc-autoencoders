@@ -70,8 +70,9 @@ if __name__ == '__main__':
                                         latent_dim=args.latent,
                                         name=name)
     optimizer = optimizers.Adam(learning_rate=args.lr)
-    loss = lambda x, x_hat: 0.
 
+
+    loss = lambda x, x_hat: 0.
 
     # callbacks
     early_stopping = callbacks.EarlyStopping(patience=args.patience)

@@ -110,7 +110,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
                  original_dim=5491,
                  latent_dim=10,
                  n_components=6,
-                 pretrain=True,
+                 pretrain=0,
                  pretrain_lr=0.0001,
                  name='VariationalDeepEmbedding'):
 
@@ -132,7 +132,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
             except OSError:
                 print("Weights for {} not found.".format(self.name))
                 print("Enabling pretrain")
-                self.pretrain = True
+                self.pretrain = 30
 
     def call(self, x):
         mu, logvar = self.autoencoder.encoder(x)
