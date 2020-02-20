@@ -97,14 +97,14 @@ class VariationalAutoEncoder(AutoEncoder):
     def encode(self, x):
         mu, logvar = self.encoder(x)
         x_hat = self.sampling([mu, logvar])
-        loss = vae_loss([x, mu, logvar, x_hat])
+        loss = self.vae_loss([x, mu, logvar, x_hat])
         self.add_loss(loss)
         return x_hat
 
 
     def vae_loss(self, inputs):
         x, mu, logvar, x_hat = inputs
-        reconstruction_loss = losses.binary_crossentropy(x, x_hat)
+        reconstruction_loss = self.original_dim * losses.binary_crossentropy(x, x_hat)
         kl_loss = -0.5 * (1 + logvar - tf.square(mu) - tf.exp(logvar))
         return tf.reduce_mean(reconstruction_loss + kl_loss)
 
