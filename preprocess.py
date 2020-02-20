@@ -43,7 +43,7 @@ class GSE:
         self.data_scaled = MinMaxScaler().fit_transform(self.data.values)
         self.cell_labels = self.data.index
 
-        if self.name in ['GSE84465', 'GSE84465']:
+        if self.name in ['GSE84465', 'GSE57872']:
             self.class_labels = LabelEncoder().fit_transform(get_metadata(self.name, self.class_name))
         else:
             self.class_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.get_classes[self.name]))
