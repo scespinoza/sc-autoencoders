@@ -136,5 +136,11 @@ if __name__ == '__main__':
     if args.model == 'vade' and args.dataset in ['GSE57872', 'GSE84465']:
         assert args.class_name != '', "Must provide a class name."
 
-    history, name = train_model(args)
-    plot_output(history, name)
+    if args.model == 'all':
+        for model in ['stacked', 'vae', 'vade']:
+            args.model = model
+            history, name = train_model(args)
+            plot_output(history, name)
+    else:
+        history, name = train_model(args)
+        plot_output(history, name)
