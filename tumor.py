@@ -5,7 +5,7 @@ from tensorflow.keras import optimizers
 from models import * 
 
 if __name__ == '__main__':
-    data = pd.read_csv('mgh26.txt', sep='\t', index_col=0)
+    data = pd.read_csv('data/mgh26.txt', sep='\t', index_col=0)
     n_cells, n_genes = data.shape
     name='stacked_mgh26'
 
