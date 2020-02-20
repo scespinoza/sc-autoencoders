@@ -3,9 +3,9 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 
-def get_gse84465_metadata(column='Cell_type'):
+def get_gse84465_metadata(index, column='Cell_type'):
     metadata = pd.read_csv('data/GSE84465_metadata.txt')
-    return metadata[column]
+    return metadata.loc[index, column]
 
 class GSE:
 
@@ -43,7 +43,7 @@ class GSE:
         self.cell_labels = self.data.index
 
         if self.name == 'GSE84465':
-            self.class_labels = LabelEncoder().fit_transform(GSE.get_classes[self.name]())
+            self.class_labels = LabelEncoder().fit_transform(GSE.get_classes[self.name](self.data.index))
         else:
             self.class_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.get_classes[self.name]))
             
