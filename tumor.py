@@ -21,7 +21,7 @@ if __name__ == '__main__':
     metadata = pd.read_csv('data/GSE57872_metadata.txt')
     filter_pop = metadata['Cell_type'].map(lambda n: not 'Population' in n)
     filter_tumor = metadata['patient_id'] == 'MGH26'
-    classes = LabelEncoder().fit_transform(metadata[filter_tumor & filter_pop]['subtype'])
+    classes = LabelEncoder().fit_transform(metadata[filter_tumor & filter_pop]['subtype'].dropna())
     
     plot_latent = PlotLatentSpace(model, data_scaled, classes, interval=20)
 
