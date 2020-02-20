@@ -13,14 +13,14 @@ class GSE:
     
 
     get_classes = {
-        'GSE57872': lambda i: i.split('_')[0],
+        'GSE57872': get_metadata,
         'GSE70630': lambda i: i.split('_')[0],
         'GSE89567': lambda i: i.split('_')[0],
         'GSE102130': lambda i: i.split('-')[0],
 
         # this dataset contains only one tumor
         'GSE132172_GliNS2': lambda i: i.split('_')[-1][0],
-        'GSE84465': get_gse84465_metadata,
+        'GSE84465': get_metadata,
         'GSE103224': lambda i: i.split('_')[0],
         'GSE131928_10x': lambda i: i.split('_')[0],
         'GSE131928_SmartSeq2': lambda i: i.split('-')[0]
@@ -44,7 +44,7 @@ class GSE:
         self.cell_labels = self.data.index
 
         if self.name in ['GSE84465', 'GSE84465']:
-            self.class_labels = LabelEncoder().fit_transform(GSE.get_classes[self.name](self.name, self.class_name))
+            self.class_labels = LabelEncoder().fit_transform(get_metadata(self.name, self.class_name))
         else:
             self.class_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.get_classes[self.name]))
             
