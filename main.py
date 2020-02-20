@@ -27,6 +27,7 @@ if __name__ == '__main__':
     parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')
     parser.add_argument('--model', type=str, default='vade', help='model to train')
     parser.add_argument('--pretrain', type=int, default=0, help='pretrain vade')
+    parser.add_argument('--pretrain_lr', type=float, default=3e-4, help='pretrain_lr')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--components', type=int, default=0, help='GMM components')
     parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
@@ -58,6 +59,7 @@ if __name__ == '__main__':
                                         latent_dim=args.latent, 
                                         n_components=n_components,
                                         pretrain=args.pretrain,
+                                        pretrain_lr=args.pretrain_lr,
                                         name=name)
     else:
         model = models_dict[args.model](original_dim=dataset.n_genes,

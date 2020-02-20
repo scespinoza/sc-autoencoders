@@ -111,7 +111,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
                  latent_dim=10,
                  n_components=6,
                  pretrain=True,
-                 batch_size=32,
+                 pretrain_lr=0.0001,
                  name='VariationalDeepEmbedding'):
 
         super(VariationalDeepEmbedding, self).__init__(name=name)
@@ -125,7 +125,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
         self.mu_prior = tf.Variable(tf.zeros([n_components, latent_dim]))
         self.logvar_prior = tf.Variable(tf.ones([n_components, latent_dim]))
         self.sampling = SamplingLayer()
-        self.batch_size = batch_size
+        self.pretrain_lr = pretrain_lr
         if not pretrain:
             try:
                 self.load_pretrained()
@@ -184,7 +184,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
 
     def fit(self, X, y, **kwargs):
         if self.pretrain:
-            self.autoencoder.compile(optimizer=optimizers.Adam(0.001), loss='binary_crossentropy')
+            self.autoencoder.compile(optimizer=optimizers.Adam(self.pretrain_lr), loss='binary_crossentropy')
             self.autoencoder.fit(X, X, epochs=self.pretrain)
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
