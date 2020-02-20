@@ -3,11 +3,9 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 
-def get_gse84465_metadata(i, get='Cell_type'):
-    plate_id, well = i.split('.')
+def get_gse84465_metadata(column='Cell_type'):
     metadata = pd.read_csv('data/GSE84465_metadata.txt')
-    info = metadata[(metadata['plate_id'] == int(plate_id)) & (metadata['well'] == well)]
-    return info[get].iloc[0]
+    return metadata[column]
 
 class GSE:
 
@@ -22,7 +20,7 @@ class GSE:
 
         # this dataset contains only one tumor
         'GSE132172_GliNS2': lambda i: i.split('_')[-1][0],
-        'GSE84465': lambda i: get_gse84465_metadata(i),
+        'GSE84465': lambda i: get_gse84465_metadata(),
         'GSE103224': lambda i: i.split('_')[0],
         'GSE131928_10x': lambda i: i.split('_')[0],
         'GSE131928_SmartSeq2': lambda i: i.split('-')[0]
