@@ -3,12 +3,31 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 
+def get_gse84465_metadata(i, get='Cell_type'):
+    plate_id, well = i.split('.')
+    metadata = pd.read_csv('data/GSE84465_metadata.txt')
+    info = metadata[(metadata['plate_id'] == int(plate_id)) & (metadata['well'] == well)]
+    return info[get].iloc[0]
 
 class GSE:
 
+
+    
+
     sep_tumor = {
         'GSE57872': lambda i: i.split('_')[0],
-        'GSE70630': lambda i: i.split('_')[0]
+        'GSE70630': lambda i: i.split('_')[0],
+        'GSE89567': lambda i: i.split('_')[0],
+        'GSE102130': lambda i: i.split('-')[0],
+
+        # this dataset contains only one tumor
+        'GSE132172_GliNS2': lambda i: i.split('_')[-1][0],
+        'GSE84465': lambda i: get_gse84465_metadata(i),
+        'GSE103224': lambda i: i.split('_')[0],
+        'GSE131928_10x': lambda i: i.split('_')[0],
+        'GSE131928_SmartSeq2': lambda i: i.split('-')[0]
+        
+
     }
 
     def __init__(self, name='GSE57872'):
@@ -18,7 +37,10 @@ class GSE:
         self.load()
 
     def load(self):
-        self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=0).T
+        if self.name == 'GSE103224':
+            self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=1).drop("0", axis=1).T
+        else:
+            self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=0).T
         self.data_scaled = MinMaxScaler().fit_transform(self.data.values)
         self.cell_labels = self.data.index
         self.tumor_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.sep_tumor[self.name]))
@@ -45,3 +67,7 @@ class GSE:
         return self.x_test, self.y_test
 
     
+if __name__ == '__main__':
+    dataset = GSE('GSE84465')
+    print(dataset.data.head())
+    print(dataset.tumor_labels)

@@ -28,7 +28,8 @@ if __name__ == '__main__':
     parser.add_argument('--model', type=str, default='vade', help='model to train')
     parser.add_argument('--pretrain', type=int, default=0, help='pretrain vade')
     parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('--components', type=int, default=6, help='GMM components')
+    parser.add_argument('--components', type=int, default=0, help='GMM components')
+    parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
 
     args = parser.parse_args()
 
@@ -46,10 +47,16 @@ if __name__ == '__main__':
         y_train = dataset.tumor_labels
         y_test = dataset.tumor_labels
 
+    if args.components == 0:
+        n_components = len(np.unique(dataset.tumor_labels))
+    else:
+        n_components = args.components
+
+    
     if args.model == 'vade':
         model = models_dict[args.model](original_dim=dataset.n_genes, 
                                         latent_dim=args.latent, 
-                                        n_components=args.components,
+                                        n_components=n_components,
                                         pretrain=args.pretrain,
                                         name=name)
     else:
@@ -68,7 +75,8 @@ if __name__ == '__main__':
 
     
     def scheduler(epoch):
-        return args.lr * (0.9 ** (epoch // 10))
+        # learning rate scheduler
+        return args.lr * (0.9 ** (epoch // args.lr_interval))
 
     lr_scheduler = callbacks.LearningRateScheduler(scheduler)
     accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.tumor_labels)
