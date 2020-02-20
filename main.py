@@ -140,7 +140,7 @@ if __name__ == '__main__':
         for model in ['stacked', 'vae', 'vade']:
             args.model = model
             history, name = train_model(args)
-            plot_output(history, name)
+            plot_output(args, history, name)
     else:
         history, name = train_model(args)
-        plot_output(history, name)
+        plot_output(args, history, name)
