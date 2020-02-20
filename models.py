@@ -90,16 +90,15 @@ class VariationalAutoEncoder(AutoEncoder):
     def call(self, x):
         mu, logvar = self.encoder(x)
         z = self.sampling([mu, logvar])
-        kl_loss = self.vae_loss([mu, logvar])
+        x_hat = self.decoder(z)
+        kl_loss = self.vae_loss([x, mu, logvar, x_hat])
         self.add_loss(kl_loss)
-        return self.decoder(z)
+        return x_hat
 
     def encode(self, x):
         mu, logvar = self.encoder(x)
-        x_hat = self.sampling([mu, logvar])
-        loss = self.vae_loss([x, mu, logvar, x_hat])
-        self.add_loss(loss)
-        return x_hat
+        return self.sampling([mu, logvar])
+        
 
 
     def vae_loss(self, inputs):
