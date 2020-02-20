@@ -96,7 +96,11 @@ class VariationalAutoEncoder(AutoEncoder):
 
     def encode(self, x):
         mu, logvar = self.encoder(x)
-        return self.sampling([mu, logvar])
+        x_hat = self.sampling([mu, logvar])
+        loss = vae_loss([x, mu, logvar, x_hat])
+        self.add_loss(loss)
+        return x_hat
+
 
     def vae_loss(self, inputs):
         x, mu, logvar, x_hat = inputs
