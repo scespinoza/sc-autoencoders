@@ -21,7 +21,7 @@ class Encoder(layers.Layer):
         self.h1 = layers.Dense(2048, activation='relu')
         self.h2 = layers.Dense(512, activation='relu')
         self.mu_dense = layers.Dense(latent_dim, activation='linear')
-        self.logvar_dense = layers.Dense(latent_dim, activation='linear')
+        self.logvar_dense = layers.Dense(latent_dim, activation='linear', kernel_initializer='zeros')
 
     def call(self, x):
         x = self.h1(x)
