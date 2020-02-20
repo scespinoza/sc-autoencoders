@@ -46,12 +46,12 @@ def load_data(args):
     else:
         n_components = args.components
 
-    return (x_train, x_test), (y_train, y_test), n_components
+    return (x_train, x_test), (y_train, y_test), n_components, dataset
 
 def train_model(args):
 
     name = args.dataset + '_' + args.class_name + '_' + args.model
-    x, y, n_components = load_data(args)
+    x, y, n_components, dataset = load_data(args)
 
     if args.model == 'vade':
         model = models_dict[args.model](original_dim=dataset.n_genes, 
