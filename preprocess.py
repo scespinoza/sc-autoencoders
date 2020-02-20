@@ -12,7 +12,7 @@ class GSE:
 
     
 
-    sep_tumor = {
+    get_classes = {
         'GSE57872': lambda i: i.split('_')[0],
         'GSE70630': lambda i: i.split('_')[0],
         'GSE89567': lambda i: i.split('_')[0],
@@ -20,7 +20,7 @@ class GSE:
 
         # this dataset contains only one tumor
         'GSE132172_GliNS2': lambda i: i.split('_')[-1][0],
-        'GSE84465': lambda i: get_gse84465_metadata(),
+        'GSE84465': get_gse84465_metadata,
         'GSE103224': lambda i: i.split('_')[0],
         'GSE131928_10x': lambda i: i.split('_')[0],
         'GSE131928_SmartSeq2': lambda i: i.split('-')[0]
@@ -41,7 +41,12 @@ class GSE:
             self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=0).T
         self.data_scaled = MinMaxScaler().fit_transform(self.data.values)
         self.cell_labels = self.data.index
-        self.tumor_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.sep_tumor[self.name]))
+
+        if self.name == 'GSE84465':
+            self.class_labels = LabelEncoder().fit_transform(GSE.get_classes[self.name]())
+        else:
+            self.class_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.get_classes[self.name]))
+            
         self.n_cells = self.data.shape[0]
         self.n_genes = self.data.shape[1]
         self.split()
@@ -49,7 +54,7 @@ class GSE:
 
     def split(self):
         x = self.data_scaled
-        y = self.tumor_labels
+        y = self.class_labels
         x_train, x_test, y_train, y_test = train_test_split(x, y)
         self.x_train = x_train
         self.x_test = x_test

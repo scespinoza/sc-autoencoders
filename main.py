@@ -44,11 +44,11 @@ if __name__ == '__main__':
     else:
         x_train = dataset.data_scaled
         x_test = dataset.data_scaled
-        y_train = dataset.tumor_labels
-        y_test = dataset.tumor_labels
+        y_train = dataset.class_labels
+        y_test = dataset.class_labels
 
     if args.components == 0:
-        n_components = len(np.unique(dataset.tumor_labels))
+        n_components = len(np.unique(dataset.class_labels))
     else:
         n_components = args.components
 
@@ -79,8 +79,8 @@ if __name__ == '__main__':
         return args.lr * (0.9 ** (epoch // args.lr_interval))
 
     lr_scheduler = callbacks.LearningRateScheduler(scheduler)
-    accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.tumor_labels)
-    plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.tumor_labels, interval=args.interval)
+    accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.class_labels)
+    plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.class_labels, interval=args.interval)
     model.compile(optimizer=optimizer, loss=loss)
 
     print("Training model: " + name)
