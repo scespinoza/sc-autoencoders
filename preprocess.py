@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 
 def get_metadata(dataset, column='Cell_type'):
     metadata = pd.read_csv('data/{}_metadata.txt'.format(dataset))
-    return metadata[column]
+    return list(metadata[column])
 
 class GSE:
 
