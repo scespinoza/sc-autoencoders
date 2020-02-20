@@ -10,6 +10,8 @@ if __name__ == '__main__':
     n_cells, n_genes = data.shape
     name='stacked_mgh26'
 
+    model = AutoEncoder(original_dim=n_genes, name=name)
+
     data_scaled = MinMaxScaler().fit_transform(data.values)
     early_stopping = callbacks.EarlyStopping(patience=50)
     model_checkpoint = callbacks.ModelCheckpoint('weights/' + name + '_trained.h5',
@@ -21,7 +23,7 @@ if __name__ == '__main__':
     
     plot_latent = PlotLatentSpace(model, data_scaled, classes, interval=20)
 
-    model = AutoEncoder(original_dim=n_genes, name=name)
+    
     model.compile(optimizer=optimizers.Adam(0.0001), loss='binary_crossentropy')
     model.fit(data_scaled, data_scaled, epochs=1000, validation_data=(data_scaled, data_scaled),
              callbacks=[early_stopping, plot_latent, model_checkpoint])
