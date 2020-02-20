@@ -218,11 +218,16 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
 
     def plot(self, epoch, loss=None):
         z = self.model.encode(self.X)
-        z = np.concatenate([z, self.model.mu_prior.numpy()], axis=0)
-        z_tsne = TSNE().fit_transform(z)
 
-        cluster_means = z_tsne[-self.model.n_components:]
-        z_tsne = z_tsne[:-self.model.n_components]
+        if isinstance(self.model, VariationalDeepEmbedding):
+            z = np.concatenate([z, self.model.mu_prior.numpy()], axis=0)
+            z_tsne = TSNE().fit_transform(z)
+
+            cluster_means = z_tsne[-self.model.n_components:]
+            z_tsne = z_tsne[:-self.model.n_components]
+        else:
+            z_tsne = TSNE().fit_transform(z)
+
 
         if isinstance(self.model, VariationalDeepEmbedding):
             fig, ax = plt.subplots(1, 2, figsize=(16, 9))
