@@ -176,7 +176,7 @@ class VaDE(tf.keras.Model):
         mu, logvar = self.autoencoder.encode(x)
         z = self.sampling([mu, logvar])
         x_hat = self.autoencoder.decoder(z)
-        kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
+        kl_loss = self.vade_loss([x, mu, logvar, x_hat])
         self.add_loss(kl_loss)
         return x_hat
 
@@ -284,7 +284,7 @@ class ZIVAE(VAE):
         mu, logvar = self.autoencoder.encode(x)
         z = self.sampling([mu, logvar])
         x_hat = self.autoencoder.decoder(z)
-        kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
+        kl_loss = self.vae_loss([x, mu, logvar, z, x_hat])
         self.add_loss(kl_loss)
         return x_hat
 
