@@ -268,7 +268,7 @@ class TauAnnealing(tf.keras.callbacks.Callback):
         self.gamma = gamma
 
     def on_epoch_end(self, epoch, logs=None):
-        if epochs % 100 == 0:
+        if epoch % 100 == 0:
             tau0 = self.model.zi.tau0
             tau = self.model.zi.tau
             tau_min = self.model.zi.tau_min
