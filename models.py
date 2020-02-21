@@ -255,10 +255,39 @@ class ZIAutoEncoder(AutoEncoder):
         return self.zi(x)
 
 class ZIVAE(VAE):
-    pass
+
+    def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
+
+        super(ZIVAE, self).__init__( *args, **kwargs)
+        self.dropout = layers.Dropout(dropout)
+        self.zi = ZILayer(tau=tau)
+
+    def call(self, x):
+        x = self.dropout(x)
+        mu, logvar = self.autoencoder.encoder(x)
+        z = self.sampling([mu, logvar])
+        x = self.autoencoder.decoder(z)
+        x_hat = self.zi(x)
+        kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
+        self.add_loss(kl_loss)
+        return x_hat
 
 class ZIVaDE(VaDE):
-    pass
+    def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
+
+        super(ZIAutoEncoder, self).__init__( *args, **kwargs)
+        self.dropout = layers.Dropout(dropout)
+        self.zi = ZILayer(tau=tau)
+
+    def call(self, x):
+        x = self.dropout(x)
+        mu, logvar = self.autoencoder.encoder(x)
+        z = self.sampling([mu, logvar])
+        x = self.autoencoder.decoder(z)
+        x_hat = self.zi(x)
+        kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
+        self.add_loss(kl_loss)
+        return x_hat
 
 
 

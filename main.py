@@ -79,19 +79,19 @@ def train_model(args):
     model_checkpoint = callbacks.ModelCheckpoint('weights/' + name + '_trained.h5',
                                                  save_best_only=True,
                                                  save_weights_only=True)
-    
+    lr_scheduler = callbacks.LearningRateScheduler(scheduler)
+
     plot_latent = PlotLatentSpace(dataset.data_scaled, dataset.class_labels, interval=args.interval)
     
     
     
     model.compile(optimizer=optimizer, loss=losses[args.model])
     
-    callbacks_list = [early_stopping, plot_latent, model_checkpoint]
+    callbacks_list = [early_stopping, plot_latent, model_checkpoint, lr_scheduler]
 
     if args.model == 'vade':
-        callbacks_list += [lr_scheduler, accuracy]
-        lr_scheduler = callbacks.LearningRateScheduler(scheduler)
         accuracy = PrintLossAndAccuracy(dataset.data_scaled, dataset.class_labels)
+        callbacks_list += [ accuracy]
     if 'zi' in args.model:
         annealing = TauAnnealing(gamma=3e-4)
         callbacks_list += [annealing]
