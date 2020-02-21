@@ -91,7 +91,7 @@ def train_model(args):
     
     model.compile(optimizer=optimizer, loss=losses[args.model])
     
-    callbacks_list = [early_stopping, plot_latent, model_checkpoint, lr_scheduler]
+    callbacks_list = [early_stopping, model_checkpoint, plot_latent, lr_scheduler]
 
     if 'vade' in args.model:
         accuracy = PrintLossAndAccuracy(dataset.data_scaled, dataset.class_labels)
