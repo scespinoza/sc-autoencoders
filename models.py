@@ -15,15 +15,6 @@ import matplotlib.pyplot as plt
 
 tf.keras.backend.set_floatx('float64')
 
-class ZeroInflated(ABC):
-
-    def __init__(self, tau=0.5):
-        self.dropout = layers.Dropout(0.5)
-        self.zi = ZeroInflatedLayer(tau)
-    
-    @abstractmethod
-    def call(self, x):
-        pass
 
 class ZILayer(layers.Layer):
 
@@ -246,11 +237,13 @@ class VaDE(tf.keras.Model):
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
 
 
-class ZIAutoEncoder(AutoEncoder, ZeroInflated):
+class ZIAutoEncoder(AutoEncoder):
 
     def __init__(self, *args, **kwargs):
 
         super(ZIAutoEncoder, self).__init__(*args, **kwargs)
+        self.dropout = layers.Dropout(kwargs['dropout'])
+        self.zi = ZILayer(tau=kwargs['tau'])
 
     def call(self, x):
         x = self.dropout(x)
