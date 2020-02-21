@@ -119,7 +119,7 @@ def plot_output(args, history, name):
     plt.savefig('figures/' + name + '/history.png')
     plt.close()
 
-    if args.model == 'vade':
+    if 'vade' in args.model:
         plt.plot(history.history['test_metric'])
         plt.title('Accuracy')
         plt.savefig('figures/' + name + '/accuracy.png')
