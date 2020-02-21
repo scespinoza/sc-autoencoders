@@ -241,9 +241,9 @@ class ZIAutoEncoder(AutoEncoder):
 
     def __init__(self, *args, **kwargs):
 
-        super(ZIAutoEncoder, self).__init__(*args, **kwargs)
-        self.dropout = layers.Dropout(kwargs['dropout'])
-        self.zi = ZILayer(tau=kwargs['tau'])
+        super(ZIAutoEncoder, self).__init__(dropout=0.5, tau=0.5, *args, **kwargs)
+        self.dropout = layers.Dropout(dropout)
+        self.zi = ZILayer(tau=tau)
 
     def call(self, x):
         x = self.dropout(x)
