@@ -95,7 +95,7 @@ class AutoEncoder(tf.keras.Model):
         self.latent_dim = latent_dim
 
     def call(self, x):
-        z = self.encode
+        z = self.encode(x)
         return self.decoder(x)
 
     
@@ -105,7 +105,7 @@ class AutoEncoder(tf.keras.Model):
 
     
     def decode(self, z):
-        return self.decder(z)
+        return self.decoder(z)
 
     def reconstruction_loss(self, x, x_hat):
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
