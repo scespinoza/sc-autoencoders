@@ -323,7 +323,7 @@ class TauAnnealing(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         if isinstance(self.model, ZIAutoEncoder):
-            zi = self.model.zi:
+            zi = self.model.zi
         else:
             zi = self.model.autoencoder.zi
         if epoch % 100 == 0:
