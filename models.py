@@ -220,7 +220,7 @@ class VaDE(tf.keras.Model):
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
         print("Fitting GMM")
-        z, _ = self.autoencoder.encoder(X)
+        z = self.autoencoder.encode(X)
         self.fit_gmm(z.numpy())
         
         print('Training VaDE')
