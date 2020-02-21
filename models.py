@@ -127,7 +127,7 @@ class VAE(AutoEncoder):
 
     
     def encode(self, x):
-        mu, logvar = self.encode(x)
+        mu, logvar = self.encoder(x)
         return self.sampling([mu, logvar])
     
     
