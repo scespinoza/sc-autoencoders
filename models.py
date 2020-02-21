@@ -301,7 +301,6 @@ class TauAnnealing(tf.keras.callbacks.Callback):
             tau0 = self.model.zi.tau0
             tau = self.model.zi.tau
             tau_min = self.model.zi.tau_min
-            logs['tau'] = tau
             new_tau = min(tau0 * np.exp(-self.gamma * epoch), tau_min)
             self.model.zi.tau = new_tau
 
