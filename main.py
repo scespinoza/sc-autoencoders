@@ -19,6 +19,7 @@ models_dict = {
 
 losses = {
     'stacked': losses.binary_crossentropy,
+    'zi-stacked': losses.binary_crossentropy,
     'vae': lambda x, x_hat: 0.,
     'vade': lambda x, x_hat: 0.
 }
