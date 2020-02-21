@@ -280,6 +280,13 @@ class ZIVaDE(VaDE):
                             latent_dim=kwargs['latent_dim'])
         self.dropout = layers.Dropout(dropout)
         self.zi = ZILayer(tau=tau)
+        if not pretrain:
+            try:
+                self.load_pretrained()
+            except OSError:
+                print("Weights for {} not found.".format(self.name))
+                print("Enabling pretrain")
+                self.pretrain = 30
 
     def call(self, x):
         x = self.dropout(x)
