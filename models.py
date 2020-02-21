@@ -173,7 +173,7 @@ class VaDE(tf.keras.Model):
                 self.pretrain = 30
 
     def call(self, x):
-        mu, logvar = self.autoencoder.encode(x)
+        mu, logvar = self.autoencoder.encoder(x)
         z = self.sampling([mu, logvar])
         x_hat = self.autoencoder.decoder(z)
         kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
