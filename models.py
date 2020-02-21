@@ -98,12 +98,12 @@ class AutoEncoder(tf.keras.Model):
         z = self.encode
         return self.decoder(x)
 
-    @tf.function
+    
     def encode(self, x):
         z, _ = self.encoder(x)
         return z
 
-    @tf.function
+    
     def decode(self, z):
         return self.decder(z)
 
@@ -127,12 +127,12 @@ class VAE(AutoEncoder):
         self.add_loss(kl_loss)
         return x_hat
 
-    @tf.function
+    
     def encode(self, x):
         mu, logvar = self.encode(x)
         return self.sampling([mu, logvar])
     
-    @tf.function
+    
     def decode(self, z):
         return self.decoder(z)
 
@@ -262,13 +262,13 @@ class ZIAutoEncoder(AutoEncoder):
         z, _ = self.encode(x)
         return self.decode(z)
     
-    @tf.function
+    
     def encode(self, x):
         x = self.dropout(x)
         mu, logvar = self.encoder(x)
         return mu, logvar
 
-    @tf.function
+    
     def decode(self, z):
         x = self.decoder(z)
         return self.zi(x)
