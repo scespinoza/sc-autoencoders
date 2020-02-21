@@ -255,7 +255,7 @@ class ZIAutoEncoder(AutoEncoder):
     @tf.function
     def encode(self, x):
         x = self.dropout(x)
-        mu, logvar = self.enc0der(x)
+        mu, logvar = self.encoder(x)
         return mu, logvar
 
     @tf.function
