@@ -199,7 +199,7 @@ class VaDE(tf.keras.Model):
         x, mu, logvar, z, x_hat = inputs
         p_c = self.pi_prior
         gamma = self.compute_gamma(z)
-        log_p_x_z = 1.5 * self.original_dim * losses.binary_crossentropy(x, x_hat)
+        log_p_x_z = self.original_dim * losses.binary_crossentropy(x, x_hat)
         h = tf.expand_dims(tf.exp(logvar), axis=1) + tf.pow(tf.expand_dims(mu, axis=1) - self.mu_prior, 2)
         h = tf.reduce_sum(self.logvar_prior + h / tf.exp(self.logvar_prior), axis=2)
         log_p_z_given_c = 0.5 * tf.reduce_sum(gamma * h, axis=1)
