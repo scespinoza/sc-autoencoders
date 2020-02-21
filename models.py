@@ -249,7 +249,6 @@ class ZIAutoEncoder(AutoEncoder):
         self.zi = ZILayer(tau=tau)
 
     def call(self, x):
-        print(self.pretrain)
         x = self.dropout(x)
         z, _ = self.encoder(x)
         x = self.decoder(z)
@@ -277,6 +276,8 @@ class ZIVaDE(VaDE):
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
         super(ZIVaDE, self).__init__( *args, **kwargs)
+        self.autoencoder = ZIAutoEncoder(original_dim=kwargs['original_dim'],
+                            latent_dim=kwargs['latent_dim'])
         self.dropout = layers.Dropout(dropout)
         self.zi = ZILayer(tau=tau)
 
