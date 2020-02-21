@@ -224,7 +224,7 @@ class VaDE(tf.keras.Model):
         self.fit_gmm(z.numpy())
         
         print('Training VaDE')
-        history = super(VariationalDeepEmbedding, self).fit(X, y, **kwargs)
+        history = super(VaDE, self).fit(X, y, **kwargs)
         return history
             
 
