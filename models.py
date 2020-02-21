@@ -18,7 +18,8 @@ tf.keras.backend.set_floatx('float64')
 
 class ZILayer(layers.Layer):
 
-    def __init__(self, tau=0.5):
+    def __init__(self, tau=0.5, name='zi'):
+        super(ZILayer, self).__init__(name=name)
         self.tau = tau
 
     def call(self, x):
