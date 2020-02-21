@@ -125,7 +125,7 @@ def plot_output(args, history, name):
         plt.savefig('figures/' + name + '/accuracy.png')
 
 if __name__ == '__main__':
-    tf.keras.backend.set_floatx('float64')
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, default='GSE57872', help='dataset to train')
     parser.add_argument('--split', action='store_true', help='split dataset on train/test')
