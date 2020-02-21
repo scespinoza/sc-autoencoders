@@ -103,7 +103,7 @@ def train_model(args):
 
     print("Training model: " + name)
     history = model.fit(x[0], x[0], epochs=args.epochs, validation_data=(x[1], x[1]),
-                callbacks=callbacks_list, verbose=args.verbose)
+                callbacks=callbacks_list, verbose=args.verbose, batch_size=args.batch_size)
     return history, name
 
 
