@@ -30,7 +30,7 @@ class ZILayer(layers.Layer):
         exp_p = tf.exp(tf.math.log(p + 1e-20) + g0 / self.tau)
         exp_q = tf.exp(tf.math.log(q + 1e-20) + g1 / self.tau)
         s = exp_p / (exp_p + exp_q)
-        return s * inputs
+        return s * x
     
     @classmethod
     def gumbel(cls, shape=None):
