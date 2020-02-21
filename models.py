@@ -18,9 +18,11 @@ tf.keras.backend.set_floatx('float64')
 
 class ZILayer(layers.Layer):
 
-    def __init__(self, tau=0.5, name='zi'):
+    def __init__(self, tau=1., name='zi'):
         super(ZILayer, self).__init__(name=name)
+        self.tau0 = tau
         self.tau = tau
+        self.tau_min = 0.5
 
     def call(self, x):
         p = tf.exp(- x ** 2)
@@ -258,12 +260,28 @@ class ZIVAE(VAE):
 class ZIVaDE(VaDE):
     pass
 
+
+
+class TauAnnealing(tf.keras.callbacks.Callback):
+
+    def __init__(self, gamma=3e-4):
+        self.gamma = gamma
+
+    def on_epoch_end(self, epoch, logs=None):
+        if epochs % 100 == 0:
+            tau0 = self.model.zi.tau0
+            tau = self.model.zi.tau
+            tau_min = self.model.zi.tau_min
+            logs['tau'] = tau
+            new_tau = min(tau0 * np.exp(-self.gamma * epoch), tau_min)
+            self.model.zi.tau = new_tau
+
+
 class PlotLatentSpace(tf.keras.callbacks.Callback):
 
-    def __init__(self, model, X, c=None, interval=20):
+    def __init__(self, X, c=None, interval=20):
         self.X = X
         self.c = c
-        self.model = model
         self.interval = interval
 
     def plot(self, epoch, loss=None):
@@ -320,11 +338,9 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             
 class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
 
-    def __init__(self, model, x, y):
-        self.model = model
+    def __init__(self, x, y):
         self.x = x
         self.y = y
-        print('init acc')
 
     def on_epoch_end(self, epoch, logs=None):
         y_pred = self.model.predict_cluster(self.x)

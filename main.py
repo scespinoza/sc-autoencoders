@@ -70,27 +70,32 @@ def train_model(args):
 
     optimizer = optimizers.Adam(learning_rate=args.lr)
 
+    def scheduler(epoch):
+        # learning rate scheduler
+        return args.lr * (args.decay ** (epoch // args.lr_interval))
 
     # callbacks
     early_stopping = callbacks.EarlyStopping(patience=args.patience)
     model_checkpoint = callbacks.ModelCheckpoint('weights/' + name + '_trained.h5',
                                                  save_best_only=True,
                                                  save_weights_only=True)
-
     
-    def scheduler(epoch):
-        # learning rate scheduler
-        return args.lr * (args.decay ** (epoch // args.lr_interval))
-
-    lr_scheduler = callbacks.LearningRateScheduler(scheduler)
-    accuracy = PrintLossAndAccuracy(model, dataset.data_scaled, dataset.class_labels)
-    plot_latent = PlotLatentSpace(model, dataset.data_scaled, dataset.class_labels, interval=args.interval)
+    plot_latent = PlotLatentSpace(dataset.data_scaled, dataset.class_labels, interval=args.interval)
+    
+    
+    
     model.compile(optimizer=optimizer, loss=losses[args.model])
+    
+    callbacks_list = [early_stopping, plot_latent, model_checkpoint]
 
     if args.model == 'vade':
-        callbacks_list = [early_stopping, lr_scheduler, accuracy, plot_latent, model_checkpoint]
-    else:
-        callbacks_list = [early_stopping, plot_latent, model_checkpoint]
+        callbacks_list += [lr_scheduler, accuracy]
+        lr_scheduler = callbacks.LearningRateScheduler(scheduler)
+        accuracy = PrintLossAndAccuracy(dataset.data_scaled, dataset.class_labels)
+    if 'zi' in args.model:
+        annealing = TauAnnealing(gamma=3e-4)
+        callbacks_list += [annealing]
+        
 
     print("Training model: " + name)
     history = model.fit(x[0], x[0], epochs=args.epochs, validation_data=(x[1], x[1]),
