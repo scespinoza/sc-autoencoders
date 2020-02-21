@@ -383,8 +383,11 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             pass
 
     def on_train_end(self, logs=None):
-        self.model.load_weights('weights/' + self.model.name + '_trained.h5')      
-        self.plot('last')
+        try:
+            self.model.load_weights('weights/' + self.model.name + '_trained.h5')      
+            self.plot('last')
+        except OSError:
+            pass
 
     def on_epoch_end(self, epoch, logs=None):
         
