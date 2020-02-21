@@ -275,7 +275,7 @@ class ZIVAE(VAE):
 class ZIVaDE(VaDE):
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
-        super(ZIAutoEncoder, self).__init__( *args, **kwargs)
+        super(ZIVaDE, self).__init__( *args, **kwargs)
         self.dropout = layers.Dropout(dropout)
         self.zi = ZILayer(tau=tau)
 
