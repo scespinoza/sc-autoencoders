@@ -42,7 +42,7 @@ class Encoder(layers.Layer):
 
     def __init__(self, original_dim=5491, latent_dim=10, name='Encoder'):
         super(Encoder, self).__init__(name=name)
-        self.h1 = layers.Dense(512, activation='relu')
+        self.h1 = layers.Dense(1024, activation='relu')
         self.h2 = layers.Dense(128, activation='relu')
         self.mu_dense = layers.Dense(latent_dim, activation='linear')
         self.logvar_dense = layers.Dense(latent_dim, activation='linear', kernel_initializer='zeros')
@@ -62,7 +62,7 @@ class Decoder(layers.Layer):
         self.latent_dim = latent_dim
         self.h1 = layers.Dense(latent_dim, activation='relu')
         self.h2 = layers.Dense(128, activation='relu')
-        self.h3 = layers.Dense(512, activation='relu')
+        self.h3 = layers.Dense(1024, activation='relu')
         self.outputs = layers.Dense(original_dim, activation='sigmoid')
 
     def call(self, x):
