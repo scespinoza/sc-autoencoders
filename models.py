@@ -230,7 +230,7 @@ class VaDE(tf.keras.Model):
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
         print("Fitting GMM")
-        z, _ = self.autoencoder.encode(X)
+        z,_ = self.autoencoder.encode(X)
         self.fit_gmm(z.numpy())
         
         print('Training VaDE')
@@ -279,8 +279,9 @@ class ZIVAE(VAE):
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
         super(ZIVAE, self).__init__( *args, **kwargs)
-        self.autoencoder = ZIAutoEncoder(original_dim=kwargs['original_dim'],
-                            latent_dim=kwargs['latent_dim'])
+        self.autoencoder = ZIAutoEncoder(dropout=dropout, tau=tau, 
+                                        original_dim=kwargs['original_dim'],
+                                        latent_dim=kwargs['latent_dim'])
 
     def call(self, x):
         mu, logvar = self.autoencoder.encode(x)
@@ -294,8 +295,9 @@ class ZIVaDE(VaDE):
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
         super(ZIVaDE, self).__init__( *args, **kwargs)
-        self.autoencoder = ZIAutoEncoder(original_dim=kwargs['original_dim'],
-                            latent_dim=kwargs['latent_dim'])
+        self.autoencoder = ZIAutoEncoder(dropout=dropout, tau=tau, 
+                                        original_dim=kwargs['original_dim'],
+                                        latent_dim=kwargs['latent_dim'])
         if not self.pretrain:
             try:
                 self.load_pretrained()
@@ -320,12 +322,16 @@ class TauAnnealing(tf.keras.callbacks.Callback):
         self.gamma = gamma
 
     def on_epoch_end(self, epoch, logs=None):
+        if isinstance(self.model, ZIAutoEncoder):
+            zi = self.model.zi:
+        else:
+            zi = self.model.autoencoder.zi
         if epoch % 100 == 0:
-            tau0 = self.model.zi.tau0
-            tau = self.model.zi.tau
-            tau_min = self.model.zi.tau_min
+            tau0 = zi.tau0
+            tau = zi.tau
+            tau_min = zi.tau_min
             new_tau = min(tau0 * np.exp(-self.gamma * epoch), tau_min)
-            self.model.zi.tau = new_tau
+            zi.tau = new_tau
 
 
 class PlotLatentSpace(tf.keras.callbacks.Callback):
