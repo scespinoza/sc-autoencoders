@@ -249,25 +249,33 @@ class ZIAutoEncoder(AutoEncoder):
         self.zi = ZILayer(tau=tau)
 
     def call(self, x):
+        z, _ = self.encode(x)
+        return self.decode(z)
+    
+    @tf.function
+    def encode(self, x):
         x = self.dropout(x)
-        z, _ = self.encoder(x)
+        mu, logvar = self.enc0der(x)
+        return mu, logvar
+
+    @tf.function
+    def decode(self, z):
         x = self.decoder(z)
         return self.zi(x)
+
 
 class ZIVAE(VAE):
 
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
         super(ZIVAE, self).__init__( *args, **kwargs)
-        self.dropout = layers.Dropout(dropout)
-        self.zi = ZILayer(tau=tau)
+        self.autoencoder = ZIAutoEncoder(original_dim=kwargs['original_dim'],
+                            latent_dim=kwargs['latent_dim'])
 
     def call(self, x):
-        x = self.dropout(x)
-        mu, logvar = self.autoencoder.encoder(x)
+        mu, logvar = self.autoencoder.encode(x)
         z = self.sampling([mu, logvar])
-        x = self.autoencoder.decoder(z)
-        x_hat = self.zi(x)
+        x_hat = self.autoencoder.decoder(z)
         kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
         self.add_loss(kl_loss)
         return x_hat
@@ -278,8 +286,6 @@ class ZIVaDE(VaDE):
         super(ZIVaDE, self).__init__( *args, **kwargs)
         self.autoencoder = ZIAutoEncoder(original_dim=kwargs['original_dim'],
                             latent_dim=kwargs['latent_dim'])
-        self.dropout = layers.Dropout(dropout)
-        self.zi = ZILayer(tau=tau)
         if not self.pretrain:
             try:
                 self.load_pretrained()
@@ -289,11 +295,9 @@ class ZIVaDE(VaDE):
                 self.pretrain = 30
 
     def call(self, x):
-        x = self.dropout(x)
-        mu, logvar = self.autoencoder.encoder(x)
+        mu, logvar = self.autoencoder.encode(x)
         z = self.sampling([mu, logvar])
-        x = self.autoencoder.decoder(z)
-        x_hat = self.zi(x)
+        x_hat = self.autoencoder.decode(z)
         kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
         self.add_loss(kl_loss)
         return x_hat
