@@ -251,10 +251,10 @@ class ZIAutoEncoder(AutoEncoder):
         x = self.decoder(z)
         return self.zi(x)
 
-class ZIVAE(VAE, ZeroInflated):
+class ZIVAE(VAE):
     pass
 
-class ZIVaDE(VaDE, ZeroInflated):
+class ZIVaDE(VaDE):
     pass
 
 class PlotLatentSpace(tf.keras.callbacks.Callback):
