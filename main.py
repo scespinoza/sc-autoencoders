@@ -15,13 +15,17 @@ models_dict = {
     'vae': VAE,
     'vade': VaDE,
     'zi_stacked': ZIAutoEncoder
+    'zi_vae': ZIVAE
+    'zi_vade': ZIVaDE
 }
 
 losses = {
     'stacked': losses.binary_crossentropy,
     'zi_stacked': losses.binary_crossentropy,
     'vae': lambda x, x_hat: 0.,
-    'vade': lambda x, x_hat: 0.
+    'zi_vae': lambda x, x_hat: 0.,
+    'vade': lambda x, x_hat: 0.,
+    'zi_vade': lambda x, x_hat: 0.
 }
 
 
@@ -146,7 +150,7 @@ if __name__ == '__main__':
         assert args.class_name != '', "Must provide a class name."
 
     if args.model == 'all':
-        for model in ['stacked', 'vae', 'vade']:
+        for model in models_dict.keys():
             args.model = model
             history, name = train_model(args)
             plot_output(args, history, name)
