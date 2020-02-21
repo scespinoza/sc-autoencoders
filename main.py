@@ -14,8 +14,8 @@ models_dict = {
     'stacked': AutoEncoder,
     'vae': VAE,
     'vade': VaDE,
-    'zi_stacked': ZIAutoEncoder
-    'zi_vae': ZIVAE
+    'zi_stacked': ZIAutoEncoder,
+    'zi_vae': ZIVAE,
     'zi_vade': ZIVaDE
 }
 
