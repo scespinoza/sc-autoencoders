@@ -96,7 +96,7 @@ class AutoEncoder(tf.keras.Model):
 
     def call(self, x):
         z = self.encode(x)
-        return self.decoder(x)
+        return self.decode(z)
 
     
     def encode(self, x):
