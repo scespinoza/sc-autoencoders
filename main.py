@@ -129,7 +129,7 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=500, help='epochs')
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--latent', type=int, default=10, help='latent dimensions')
-    parser.add_argument('--patience', type=int, default=30, help='patience for early stopping')
+    parser.add_argument('--patience', type=int, default=50, help='patience for early stopping')
     parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')
     parser.add_argument('--model', type=str, default='vade', help='model to train')
     parser.add_argument('--pretrain', type=int, default=0, help='pretrain vade')
