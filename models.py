@@ -95,13 +95,13 @@ class AutoEncoder(tf.keras.Model):
         self.latent_dim = latent_dim
 
     def call(self, x):
-        z = self.encode(x)
+        z, _ = self.encode(x)
         return self.decode(z)
 
     
     def encode(self, x):
-        z, _ = self.encoder(x)
-        return z
+        mu, logvar = self.encoder(x)
+        return mu, logvar
 
     
     def decode(self, z):
@@ -175,7 +175,7 @@ class VaDE(tf.keras.Model):
                 self.pretrain = 30
 
     def call(self, x):
-        mu, logvar = self.autoencoder.encoder(x)
+        mu, logvar = self.autoencoder.encode(x)
         z = self.sampling([mu, logvar])
         x_hat = self.autoencoder.decoder(z)
         kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
@@ -268,7 +268,6 @@ class ZIAutoEncoder(AutoEncoder):
         mu, logvar = self.encoder(x)
         return mu, logvar
 
-    
     def decode(self, z):
         x = self.decoder(z)
         return self.zi(x)
