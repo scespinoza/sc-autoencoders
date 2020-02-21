@@ -12,8 +12,9 @@ warnings.filterwarnings("ignore")
 
 models_dict = {
     'stacked': AutoEncoder,
-    'vae': VariationalAutoEncoder,
-    'vade': VariationalDeepEmbedding
+    'vae': VAE,
+    'vade': VaDE,
+    'zi-stacked': ZIAutoEncoder
 }
 
 losses = {
@@ -120,6 +121,7 @@ if __name__ == '__main__':
     parser.add_argument('--split', action='store_true', help='split dataset on train/test')
     parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
     parser.add_argument('--epochs', type=int, default=500, help='epochs')
+    parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--latent', type=int, default=10, help='latent dimensions')
     parser.add_argument('--patience', type=int, default=30, help='patience for early stopping')
     parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')

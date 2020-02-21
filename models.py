@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from abc import ABC, abstractmethod
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras import losses
@@ -13,6 +14,37 @@ from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
 
 tf.keras.backend.set_floatx('float64')
+
+class ZeroInflated(ABC):
+
+    def __init__(self, tau=0.5):
+        self.dropout = layers.Dropout(0.5)
+        self.zi = ZeroInflatedLayer(tau)
+    
+    @abstractmethod
+    def call(self, x):
+        pass
+
+class ZILayer(layers.Layer):
+
+    def __init__(self, tau=0.5):
+        self.tau = tau
+
+    def call(self, x):
+        p = tf.exp(- x ** 2)
+        q = 1 - p
+        g0 = ZILayer.gumbel(shape=tf.shape(inputs))
+        g1 = ZILayer.gumbel(shape=tf.shape(inputs))
+        exp_p = tf.exp(tf.math.log(p + 1e-20) + g0 / self.tau)
+        exp_q = tf.exp(tf.math.log(q + 1e-20) + g1 / self.tau)
+        s = exp_p / (exp_p + exp_q)
+        return s * inputs
+    
+    @classmethod
+    def gumbel(cls, shape=None):
+        eps=1e-20
+        return -tf.math.log(-tf.math.log(tf.random.uniform(shape=shape) + eps) + eps)
+
 
 class Encoder(layers.Layer):
 
@@ -80,10 +112,10 @@ class AutoEncoder(tf.keras.Model):
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
 
 
-class VariationalAutoEncoder(AutoEncoder):
+class VAE(AutoEncoder):
 
-    def __init__(self, original_dim=5491, latent_dim=10, name='VariationalAutoEncoder'):
-        super(VariationalAutoEncoder, self).__init__(original_dim=original_dim,
+    def __init__(self, original_dim=5491, latent_dim=10, name='VAE'):
+        super(VAE, self).__init__(original_dim=original_dim,
                                                      latent_dim=latent_dim,
                                                      name=name)
         self.sampling = SamplingLayer()
@@ -109,7 +141,7 @@ class VariationalAutoEncoder(AutoEncoder):
         return tf.reduce_mean(reconstruction_loss + kl_loss)
 
 
-class VariationalDeepEmbedding(tf.keras.Model):
+class VaDE(tf.keras.Model):
 
     def __init__(self,
                  original_dim=5491,
@@ -119,7 +151,7 @@ class VariationalDeepEmbedding(tf.keras.Model):
                  pretrain_lr=0.0001,
                  name='VariationalDeepEmbedding'):
 
-        super(VariationalDeepEmbedding, self).__init__(name=name)
+        super(VaDE, self).__init__(name=name)
         self.original_dim = original_dim
         self.latent_dim = latent_dim
         self.n_components = n_components
@@ -213,6 +245,25 @@ class VariationalDeepEmbedding(tf.keras.Model):
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
 
+
+class ZIAutoEncoder(AutoEncoder, ZeroInflated):
+
+    def __init__(self, **kwargs):
+
+        super(ZIAutoEncoder, self).__init__(**kwargs)
+
+    def call(self, x):
+        x = self.dropout(x)
+        z, _ = self.encoder(x)
+        x = self.decoder(z)
+        return self.zi(x)
+
+class ZIVAE(VAE, ZeroInflated):
+    pass
+
+class ZIVaDE(VaDE, ZeroInflated):
+    pass
+
 class PlotLatentSpace(tf.keras.callbacks.Callback):
 
     def __init__(self, model, X, c=None, interval=20):
@@ -224,7 +275,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
     def plot(self, epoch, loss=None):
         z = self.model.encode(self.X)
 
-        if isinstance(self.model, VariationalDeepEmbedding):
+        if isinstance(self.model, VaDE):
             z = np.concatenate([z, self.model.mu_prior.numpy()], axis=0)
             z_tsne = TSNE().fit_transform(z)
 
@@ -234,7 +285,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             z_tsne = TSNE().fit_transform(z)
 
 
-        if isinstance(self.model, VariationalDeepEmbedding):
+        if isinstance(self.model, VaDE):
             fig, ax = plt.subplots(1, 2, figsize=(16, 9))
             title = 'epoch = {}, loss = {:.2f}'.format(epoch, loss)
             ax[0].scatter(z_tsne[:, 0], z_tsne[:, 1], c=self.c, cmap='rainbow', alpha=0.6)
