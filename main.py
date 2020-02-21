@@ -59,7 +59,7 @@ def train_model(args):
     name = args.dataset + '_' + args.class_name + '_' + args.model
     x, y, n_components, dataset = load_data(args)
 
-    if args.model == 'vade':
+    if 'vade' in args.model:
         model = models_dict[args.model](original_dim=dataset.n_genes, 
                                         latent_dim=args.latent, 
                                         n_components=n_components,
