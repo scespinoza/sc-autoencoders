@@ -13,8 +13,7 @@ from scipy.optimize import linear_sum_assignment
 
 import matplotlib.pyplot as plt
 
-tf.keras.backend.set_floatx('float32')
-
+tf.keras.backend.set_floatx('float64')
 
 class ZILayer(layers.Layer):
 
