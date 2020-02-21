@@ -248,9 +248,9 @@ class VaDE(tf.keras.Model):
 
 class ZIAutoEncoder(AutoEncoder, ZeroInflated):
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
 
-        super(ZIAutoEncoder, self).__init__(**kwargs)
+        super(ZIAutoEncoder, self).__init__(*args, **kwargs)
 
     def call(self, x):
         x = self.dropout(x)

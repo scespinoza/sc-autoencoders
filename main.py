@@ -14,12 +14,12 @@ models_dict = {
     'stacked': AutoEncoder,
     'vae': VAE,
     'vade': VaDE,
-    'zi-stacked': ZIAutoEncoder
+    'zi_stacked': ZIAutoEncoder
 }
 
 losses = {
     'stacked': losses.binary_crossentropy,
-    'zi-stacked': losses.binary_crossentropy,
+    'zi_stacked': losses.binary_crossentropy,
     'vae': lambda x, x_hat: 0.,
     'vade': lambda x, x_hat: 0.
 }
