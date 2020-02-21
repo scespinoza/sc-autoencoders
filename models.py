@@ -95,12 +95,17 @@ class AutoEncoder(tf.keras.Model):
         self.latent_dim = latent_dim
 
     def call(self, x):
-        x, _ = self.encoder(x)
+        z = self.encode
         return self.decoder(x)
 
+    @tf.function
     def encode(self, x):
         z, _ = self.encoder(x)
-        return z.numpy()
+        return z
+
+    @tf.function
+    def decode(self, z):
+        return self.decder(z)
 
     def reconstruction_loss(self, x, x_hat):
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
@@ -122,10 +127,14 @@ class VAE(AutoEncoder):
         self.add_loss(kl_loss)
         return x_hat
 
+    @tf.function
     def encode(self, x):
-        mu, logvar = self.encoder(x)
+        mu, logvar = self.encode(x)
         return self.sampling([mu, logvar])
-        
+    
+    @tf.function
+    def decode(self, z):
+        return self.decoder(z)
 
 
     def vae_loss(self, inputs):
@@ -173,6 +182,7 @@ class VaDE(tf.keras.Model):
         self.add_loss(kl_loss)
         return x_hat
 
+    @tf.function
     def encode(self, x):
         mu, logvar = self.autoencoder.encoder(x)
         return self.sampling([mu, logvar])
