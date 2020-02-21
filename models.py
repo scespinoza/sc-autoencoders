@@ -280,7 +280,7 @@ class ZIVaDE(VaDE):
                             latent_dim=kwargs['latent_dim'])
         self.dropout = layers.Dropout(dropout)
         self.zi = ZILayer(tau=tau)
-        if not pretrain:
+        if not self.pretrain:
             try:
                 self.load_pretrained()
             except OSError:
