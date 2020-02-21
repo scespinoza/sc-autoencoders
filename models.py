@@ -25,8 +25,8 @@ class ZILayer(layers.Layer):
     def call(self, x):
         p = tf.exp(- x ** 2)
         q = 1 - p
-        g0 = ZILayer.gumbel(shape=tf.shape(inputs))
-        g1 = ZILayer.gumbel(shape=tf.shape(inputs))
+        g0 = ZILayer.gumbel(shape=tf.shape(x))
+        g1 = ZILayer.gumbel(shape=tf.shape(x))
         exp_p = tf.exp(tf.math.log(p + 1e-20) + g0 / self.tau)
         exp_q = tf.exp(tf.math.log(q + 1e-20) + g1 / self.tau)
         s = exp_p / (exp_p + exp_q)
