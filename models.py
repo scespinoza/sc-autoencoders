@@ -341,6 +341,8 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
     def plot(self, epoch, loss=None):
         loss = loss or 0.
         z = self.model.encode(self.X)
+        if len(z) == 2:
+            z = z[0]
 
         if isinstance(self.model, VaDE):
             z = np.concatenate([z, self.model.mu_prior.numpy()], axis=0)
