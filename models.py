@@ -313,7 +313,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
         self.interval = interval
 
     def plot(self, epoch, loss=None):
-        loss = loss or '-'
+        loss = loss or 0.
         z = self.model.encode(self.X)
 
         if isinstance(self.model, VaDE):
