@@ -93,7 +93,7 @@ def train_model(args):
     
     callbacks_list = [early_stopping, plot_latent, model_checkpoint, lr_scheduler]
 
-    if args.model == 'vade':
+    if 'vade' in args.model:
         accuracy = PrintLossAndAccuracy(dataset.data_scaled, dataset.class_labels)
         callbacks_list += [ accuracy]
     if 'zi' in args.model:

@@ -249,6 +249,7 @@ class ZIAutoEncoder(AutoEncoder):
         self.zi = ZILayer(tau=tau)
 
     def call(self, x):
+        print(self.pretrain)
         x = self.dropout(x)
         z, _ = self.encoder(x)
         x = self.decoder(z)
