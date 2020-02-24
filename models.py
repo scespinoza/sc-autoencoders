@@ -208,7 +208,7 @@ class VaDE(tf.keras.Model):
         log_p_c = tf.reduce_sum(gamma * tf.math.log(p_c + 1e-30), axis=1)
         log_q_c_given_x = tf.reduce_sum(gamma * tf.math.log(gamma + 1e-30), axis=1)
         log_q_z_given_x = 0.5 * tf.reduce_sum(1 + logvar, axis=1)
-        loss = tf.reduce_mean(log_p_x_z + k * (log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x))
+        loss = tf.reduce_mean(log_p_x_z + self.k * (log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x))
         
         return loss
 
@@ -322,7 +322,7 @@ class WarmUpCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         if self.model.k < 1:
             self.model.k = k + epochs * beta
-            
+
 class TauAnnealing(tf.keras.callbacks.Callback):
 
     def __init__(self, gamma=3e-4):
