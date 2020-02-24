@@ -9,9 +9,6 @@ def get_metadata(dataset, column='Cell_type'):
 
 class GSE:
 
-
-    
-
     get_classes = {
         'GSE57872': get_metadata,
         'GSE70630': lambda i: i.split('_')[0],
@@ -24,8 +21,6 @@ class GSE:
         'GSE103224': lambda i: i.split('_')[0],
         'GSE131928_10x': lambda i: i.split('_')[0],
         'GSE131928_SmartSeq2': lambda i: i.split('-')[0]
-        
-
     }
 
     def __init__(self, name='GSE57872', class_name=None):
