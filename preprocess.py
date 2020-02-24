@@ -15,7 +15,7 @@ class GSE:
     get_classes = {
         'GSE57872': get_metadata,
         'GSE70630': lambda i: i.split('_')[0],
-        'GSE89567': lambda i: i.split('_')[0],
+        'GSE89567': lambda i: i.split('_')[0].split('-')[0].upper().replace('MGH', ''),
         'GSE102130': lambda i: i.split('-')[0],
 
         # this dataset contains only one tumor
