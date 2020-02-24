@@ -321,7 +321,7 @@ class WarmUpCallback(tf.keras.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         if self.model.k < 1:
-            self.model.k = k + epochs * beta
+            self.model.k = self.k + epoch * self.b
 
 class TauAnnealing(tf.keras.callbacks.Callback):
 
