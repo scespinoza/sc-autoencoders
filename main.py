@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.model == 'vade' and args.dataset in ['GSE57872', 'GSE84465']:
+    if args.dataset in ['GSE57872', 'GSE84465']:
         assert args.class_name != '', "Must provide a class name."
 
     if args.model == 'all':
