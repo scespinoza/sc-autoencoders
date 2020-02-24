@@ -65,6 +65,7 @@ def train_model(args):
                                         n_components=n_components,
                                         pretrain=args.pretrain,
                                         pretrain_lr=args.pretrain_lr,
+                                        k=args.k,
                                         name=name)
     else:
         model = models_dict[args.model](original_dim=dataset.n_genes,
@@ -87,15 +88,15 @@ def train_model(args):
 
     plot_latent = PlotLatentSpace(dataset.data_scaled, dataset.class_labels, interval=args.interval)
     
-    
-    
     model.compile(optimizer=optimizer, loss=losses[args.model])
     
     callbacks_list = [early_stopping, model_checkpoint, plot_latent, lr_scheduler]
 
     if 'vade' in args.model:
-        accuracy = PrintLossAndAccuracy(dataset.data_scaled, dataset.class_labels)
-        callbacks_list += [ accuracy]
+        accuracy = PrintLossAndAccuracy(dataset.data_scaled, dataset.class_labels)        
+        callbacks_list += [accuracy]
+        if args.warmup:
+            callbacks_list += [WarmUpCallback(k=args.k)]
     if 'zi' in args.model:
         annealing = TauAnnealing(gamma=3e-4)
         callbacks_list += [annealing]
@@ -143,6 +144,8 @@ if __name__ == '__main__':
     parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
     parser.add_argument('--decay', type=float, default=0.99)
     parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
+    parser.add_argument('--k', type=float, default=1., help='initial contribution of vade loss')
+    parser.add_Argument('--warmup', action='store_true')
 
     args = parser.parse_args()
 

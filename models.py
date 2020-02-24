@@ -150,6 +150,7 @@ class VaDE(tf.keras.Model):
                  n_components=6,
                  pretrain=0,
                  pretrain_lr=0.0001,
+                 k = 1,
                  name='VariationalDeepEmbedding'):
 
         super(VaDE, self).__init__(name=name)
@@ -164,6 +165,7 @@ class VaDE(tf.keras.Model):
         self.logvar_prior = tf.Variable(tf.ones([n_components, latent_dim]))
         self.sampling = SamplingLayer()
         self.pretrain_lr = pretrain_lr
+        self.k = k
         if not pretrain:
             try:
                 self.load_pretrained()
@@ -206,7 +208,7 @@ class VaDE(tf.keras.Model):
         log_p_c = tf.reduce_sum(gamma * tf.math.log(p_c + 1e-30), axis=1)
         log_q_c_given_x = tf.reduce_sum(gamma * tf.math.log(gamma + 1e-30), axis=1)
         log_q_z_given_x = 0.5 * tf.reduce_sum(1 + logvar, axis=1)
-        loss = tf.reduce_mean(log_p_x_z + log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x)
+        loss = tf.reduce_mean(log_p_x_z + k * (log_p_z_given_c - log_p_c + log_q_c_given_x  - log_q_z_given_x))
         
         return loss
 
@@ -311,8 +313,16 @@ class ZIVaDE(VaDE):
         self.add_loss(kl_loss)
         return x_hat
 
+class WarmUpCallback(tf.keras.callbacks.Callback):
 
+    def __init__(self, k=0, b=0.05):
+        self.k = k
+        self.b = b
 
+    def on_epoch_end(self, epoch, logs=None):
+        if self.model.k < 1:
+            self.model.k = k + epochs * beta
+            
 class TauAnnealing(tf.keras.callbacks.Callback):
 
     def __init__(self, gamma=3e-4):
