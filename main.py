@@ -145,7 +145,7 @@ if __name__ == '__main__':
     parser.add_argument('--decay', type=float, default=0.99)
     parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
     parser.add_argument('--k', type=float, default=1., help='initial contribution of vade loss')
-    parser.add_Argument('--warmup', action='store_true')
+    parser.add_argument('--warmup', action='store_true')
 
     args = parser.parse_args()
 
