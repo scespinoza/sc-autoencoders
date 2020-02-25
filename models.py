@@ -260,7 +260,7 @@ class VaDE(tf.keras.Model):
         for k in range(*klims):
             gmm = GaussianMixture(n_components=k, covariance_type='diag')
             labels = gmm.fit_predict(X)
-            scores[k] = silhouette(X, label)
+            scores[k] = silhouette_score(X, label)
             print('k = {}, score = {:.2f}'.format(k, scores[k]))
         return max(scores, key=scores.get)
             
