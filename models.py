@@ -213,7 +213,6 @@ class VaDE(tf.keras.Model):
         return loss
 
     def compute_gamma(self, z):
-self.k * l
         p_c = self.pi_prior
         #print(p_c)
         h = ((tf.expand_dims(z, axis=1) - self.mu_prior)  ** 2) /  tf.exp(self.logvar_prior)
