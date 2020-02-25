@@ -237,6 +237,7 @@ class VaDE(tf.keras.Model):
         self.fit_gmm(z.numpy())
         
         print('Training VaDE')
+        print(self.n_components)
         history = super(VaDE, self).fit(X, y, **kwargs)
         return history
             
