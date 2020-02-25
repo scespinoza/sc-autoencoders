@@ -66,6 +66,7 @@ def train_model(args):
                                         pretrain=args.pretrain,
                                         pretrain_lr=args.pretrain_lr,
                                         k=args.k,
+                                        search_k = args.search_k,
                                         name=name)
     else:
         model = models_dict[args.model](original_dim=dataset.n_genes,
@@ -145,7 +146,8 @@ if __name__ == '__main__':
     parser.add_argument('--decay', type=float, default=0.99)
     parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
     parser.add_argument('--k', type=float, default=1., help='initial contribution of vade loss')
-    parser.add_argument('--warmup', action='store_true')
+    parser.add_argument('--warmup', action='store_true', help='warmup for kappa parameter')
+    parser.add_argument('--search_k', action='store_true', help='search for best k in the latent space')
 
     args = parser.parse_args()
 
