@@ -233,7 +233,7 @@ class VaDE(tf.keras.Model):
             self.pretrain = False
         
         z, _ = self.autoencoder.encode(X)
-        print('Fitting GMM')
+        
         self.fit_gmm(z.numpy())
         
         print('Training VaDE')
@@ -247,6 +247,7 @@ class VaDE(tf.keras.Model):
 
     def fit_gmm(self, X):
         if self.search_k:
+            print('Searching K')
             self.n_components = self.select_k(X)
         print("Fitting GMM with {} components.".format(self.n_components))
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
