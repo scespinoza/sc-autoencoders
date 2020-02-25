@@ -343,10 +343,11 @@ class TauAnnealing(tf.keras.callbacks.Callback):
 
 class PlotLatentSpace(tf.keras.callbacks.Callback):
 
-    def __init__(self, X, c=None, interval=20):
+    def __init__(self, X, c=None, interval=20, random_state=42):
         self.X = X
         self.c = c
         self.interval = interval
+        self.random_state = random_state
 
     def plot(self, epoch, loss=None):
         loss = loss or 0.
@@ -356,12 +357,12 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
 
         if isinstance(self.model, VaDE):
             z = np.concatenate([z, self.model.mu_prior.numpy()], axis=0)
-            z_tsne = TSNE().fit_transform(z)
+            z_tsne = TSNE(random_state=self.random_state).fit_transform(z)
 
             cluster_means = z_tsne[-self.model.n_components:]
             z_tsne = z_tsne[:-self.model.n_components]
         else:
-            z_tsne = TSNE().fit_transform(z)
+            z_tsne = TSNE(random_state=self.random_state).fit_transform(z)
 
 
         if isinstance(self.model, VaDE):
