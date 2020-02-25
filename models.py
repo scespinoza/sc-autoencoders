@@ -251,11 +251,11 @@ class VaDE(tf.keras.Model):
         print("Fitting GMM with {} components.".format(self.n_components))
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
         self.gmm.fit(X)
-        self.pi_prior = tf.Variable(self.gmm.weights_)
-        self.mu_prior = tf.Variable(self.gmm.means_)
-        self.logvar_prior = tf.Variable(np.log(self.gmm.covariances_))
+        self.pi_prior = tf.Variable(self.gmm.weights_, dtype=tf.float32)
+        self.mu_prior = tf.Variable(self.gmm.means_, dtype=tf.float32)
+        self.logvar_prior = tf.Variable(np.log(self.gmm.covariances_), dtype=tf.float32)
 
-    def select_k(self, X, klims=(2, 10)):
+    def select_k(self, X, klims=(2, 20)):
         scores = {}
         for k in range(*klims):
             gmm = GaussianMixture(n_components=k, covariance_type='diag')
