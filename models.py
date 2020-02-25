@@ -8,6 +8,7 @@ from tensorflow.keras import optimizers
 from tensorflow.keras import initializers
 
 from sklearn.mixture import GaussianMixture
+from sklearn.metrics import silhouette_score
 from sklearn.manifold import TSNE
 from scipy.optimize import linear_sum_assignment
 
@@ -151,6 +152,7 @@ class VaDE(tf.keras.Model):
                  pretrain=0,
                  pretrain_lr=0.0001,
                  k = 1,
+                 search_k=False,
                  name='VariationalDeepEmbedding'):
 
         super(VaDE, self).__init__(name=name)
@@ -166,6 +168,7 @@ class VaDE(tf.keras.Model):
         self.sampling = SamplingLayer()
         self.pretrain_lr = pretrain_lr
         self.k = k
+        self.search_k = search_k
         if not pretrain:
             try:
                 self.load_pretrained()
@@ -242,11 +245,30 @@ class VaDE(tf.keras.Model):
         self.autoencoder.load_weights('weights/' + self.name + '_pretrained.h5')
 
     def fit_gmm(self, X):
+        if self.search_k:
+            self.n_components = self.select_k(X)
+        
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
         self.gmm.fit(X)
         self.pi_prior.assign(self.gmm.weights_)
         self.mu_prior.assign(self.gmm.means_)
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
+
+    def select_k(self, X, klims=(2, 10)):
+        z, _ = self.autoencoder.encode(X)
+        z = z.numpy()
+        scores = {}
+        for k in range(*klims):
+            gmm = GaussianMixture(n_components=k, covariance_type='diag')
+            labels = gmm.fit_predict(z)
+            scores[k] = silhouette_score(z, labels)
+
+        return max(scores, key=scores.get)
+            
+        
+
+
+
 
 
 class ZIAutoEncoder(AutoEncoder):
