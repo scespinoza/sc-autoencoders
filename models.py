@@ -233,11 +233,11 @@ class VaDE(tf.keras.Model):
             self.pretrain = False
         
         z, _ = self.autoencoder.encode(X)
-        
+        print(self.n_components)
         self.fit_gmm(z.numpy())
         
         print('Training VaDE')
-        print(self.n_components)
+        
         history = super(VaDE, self).fit(X, y, **kwargs)
         return history
             
