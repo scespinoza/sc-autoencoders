@@ -231,8 +231,9 @@ class VaDE(tf.keras.Model):
             self.autoencoder.fit(X, X, epochs=self.pretrain)
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
-        print("Fitting GMM")
+        
         z, _ = self.autoencoder.encode(X)
+        print('Fitting GMM')
         self.fit_gmm(z.numpy())
         
         print('Training VaDE')
@@ -247,7 +248,7 @@ class VaDE(tf.keras.Model):
     def fit_gmm(self, X):
         if self.search_k:
             self.n_components = self.select_k(X)
-        
+        print("Fitting GMM with {} components.".format(self.n_components))
         self.gmm = GaussianMixture(n_components=self.n_components, covariance_type='diag')
         self.gmm.fit(X)
         self.pi_prior.assign(self.gmm.weights_)
@@ -255,14 +256,12 @@ class VaDE(tf.keras.Model):
         self.logvar_prior.assign(np.log(self.gmm.covariances_))
 
     def select_k(self, X, klims=(2, 10)):
-        z, _ = self.autoencoder.encode(X)
-        z = z.numpy()
         scores = {}
         for k in range(*klims):
             gmm = GaussianMixture(n_components=k, covariance_type='diag')
-            labels = gmm.fit_predict(z)
+            labels = gmm.fit_predict(X)
             scores[k] = silhouette_score(z, labels)
-
+            print('k = {}, score = {:.2f}'.format(k, scores[k]))
         return max(scores, key=scores.get)
             
         
