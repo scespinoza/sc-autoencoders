@@ -49,7 +49,7 @@ def load_data(args):
 
     if args.components == 0:
         n_components = len(np.unique(dataset.class_labels))
-        print(n_components)
+        print(dataset.class_labels)
     else:
         n_components = args.components
 
