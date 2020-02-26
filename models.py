@@ -493,7 +493,8 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     if isinstance(z, tuple):
         z = z[0]
 
-    c = c or dataset.class_labels
+    if c is None
+        c = dataset.class_labels
 
     z_tsne = TSNE().fit_transform(z)
 
