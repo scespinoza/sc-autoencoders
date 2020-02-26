@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from preprocess import GSE
 
-tf.keras.backend.set_floatx('float64')
+
 
 class ZILayer(layers.Layer):
 
@@ -492,7 +492,7 @@ def plot_latent(dataset, model, ax=None, **kwargs):
 
     if isinstance(z, tuple):
         z = z[0]
-        
+
     c = dataset.class_labels
 
     z_tsne = TSNE().fit_transform(z)
