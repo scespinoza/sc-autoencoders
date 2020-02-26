@@ -14,6 +14,16 @@ from scipy.optimize import linear_sum_assignment
 
 import matplotlib.pyplot as plt
 
+from preprocess import GSE
+
+models_dict = {
+    'stacked': AutoEncoder,
+    'vae': VAE,
+    'vade': VaDE,
+    'zi_stacked': ZIAutoEncoder,
+    'zi_vae': ZIVAE,
+    'zi_vade': ZIVaDE
+}
 
 class ZILayer(layers.Layer):
 
@@ -462,3 +472,13 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         ind = linear_sum_assignment(w.max() - w)
         return sum([w[i,j] for i,j in zip(*ind)])*1.0/len(y_pred)*100, w
 
+
+def load_weights(dataset, model, class_name='', n_classes=0):
+    weights_filename = dataset + '_' + class_name + '_' + model + '_trained.h5'
+    dataset = GSE(name=dataset, class_name=class_name)
+    
+    model = models_dict[model](original_dim=dataset.n_genes)
+    model.build(input_shape=(None, dataset.n_genes))
+    model.load_weights('weights/' + weights_filename)
+    return dataset, model
+    
