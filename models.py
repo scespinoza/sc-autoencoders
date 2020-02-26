@@ -13,7 +13,7 @@ from sklearn.manifold import TSNE
 from scipy.optimize import linear_sum_assignment
 
 import matplotlib.pyplot as plt
-
+import seaborn as sns
 from preprocess import GSE
 
 
