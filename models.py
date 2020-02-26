@@ -396,8 +396,8 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             ax[0].scatter(z_tsne[:, 0], z_tsne[:, 1], c=self.c, cmap='rainbow', alpha=0.6)
             ax[0].set_title('tumor')
             predicted_cluster = self.model.predict_cluster(self.X)
-            ax[1].scatter(z_tsne[:, 0], z_tsne[:, 1], c=predicted_cluster, cmap='rainbow', alpha=0.6)
-            ax[1].scatter(cluster_means[:, 0], cluster_means[:, 1], c='black', s=30)
+            ax[1].scatter(z_tsne[:, 0], z_tsne[:, 1], c=predicted_cluster, cmap='rainbow', alpha=0.6, s=5)
+            ax[1].scatter(cluster_means[:, 0], cluster_means[:, 1], c='black', s=30, alpha=0.6)
             ax[1].set_title('predicted_cluster')
             fig.suptitle(title)
             fig.savefig('figures/' + self.model.name + "/epoch_{}.png".format(epoch))
@@ -447,14 +447,14 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         val_loss = logs['val_loss']
         print()
         print('Epoch: {}, loss: {:.2f}, val_loss: {:.2f}, Acc: {:.2f}'.format(epoch, loss, val_loss, acc))
-        print('pi: ', self.model.pi_prior.numpy())
+        #print('pi: ', self.model.pi_prior.numpy())
         z =self.model.encode(self.x[:1])
         gamma = self.model.compute_gamma(z).numpy()
 
         #print('gamma: ', gamma)
         #log_p_z_given_c = -0.5 * tf.reduce_sum(((self.model.mu_prior - z) ** 2) / tf.exp(self.model.logvar_prior), axis=1)
         #print('log p(c)p(z|c): ', log_p_z_given_c)
-        print('gamma: ', gamma)
+        #print('gamma: ', gamma)
 
 
     def compute_accuracy(self, y_true, y_pred):
