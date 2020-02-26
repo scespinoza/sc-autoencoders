@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from preprocess import GSE
 
+tf.keras.backend.set_floatx('float64')
 
 class ZILayer(layers.Layer):
 
@@ -101,8 +102,8 @@ class AutoEncoder(tf.keras.Model):
 
     
     def encode(self, x):
-        mu, _ = self.encoder(x)
-        return mu
+        mu, logvar = self.encoder(x)
+        return mu, logvar
 
     
     def decode(self, z):
@@ -193,7 +194,7 @@ class VaDE(tf.keras.Model):
         return self.sampling([mu, logvar])
 
     def predict_cluster(self, x):
-        z = self.encode(x)
+        z, _ = self.encode(x)
         gamma = self.compute_gamma(z)
         return tf.argmax(gamma, axis=1)
 
@@ -332,7 +333,7 @@ class ZIVaDE(VaDE):
     def call(self, x):
         mu, logvar = self.autoencoder.encode(x)
         z = self.sampling([mu, logvar])
-        x_hat = self.autoencoder.decode(z)
+        x_hat = self.autoencoder.decoder(z)
         kl_loss = self.vade_loss([x, mu, logvar, z, x_hat])
         self.add_loss(kl_loss)
         return x_hat
@@ -488,6 +489,10 @@ def plot_latent(dataset, model, ax=None, **kwargs):
     ax = ax or plt.gca()
 
     z = model.encode(dataset.data_scaled)
+
+    if isinstance(z, tuple):
+        z = z[0]
+        
     c = dataset.class_labels
 
     z_tsne = TSNE().fit_transform(z)
