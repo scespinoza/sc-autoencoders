@@ -16,14 +16,6 @@ import matplotlib.pyplot as plt
 
 from preprocess import GSE
 
-models_dict = {
-    'stacked': AutoEncoder,
-    'vae': VAE,
-    'vade': VaDE,
-    'zi_stacked': ZIAutoEncoder,
-    'zi_vae': ZIVAE,
-    'zi_vade': ZIVaDE
-}
 
 class ZILayer(layers.Layer):
 
@@ -472,6 +464,15 @@ class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
         ind = linear_sum_assignment(w.max() - w)
         return sum([w[i,j] for i,j in zip(*ind)])*1.0/len(y_pred)*100, w
 
+
+models_dict = {
+    'stacked': AutoEncoder,
+    'vae': VAE,
+    'vade': VaDE,
+    'zi_stacked': ZIAutoEncoder,
+    'zi_vae': ZIVAE,
+    'zi_vade': ZIVaDE
+}
 
 def load_weights(dataset, model, class_name='', n_classes=0):
     weights_filename = dataset + '_' + class_name + '_' + model + '_trained.h5'
