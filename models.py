@@ -484,7 +484,7 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     model.load_weights('weights/' + weights_filename)
     return dataset, model
 
-def plot_latent(dataset, model, ax=None, **kwargs):
+def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     ax = ax or plt.gca()
 
@@ -493,7 +493,7 @@ def plot_latent(dataset, model, ax=None, **kwargs):
     if isinstance(z, tuple):
         z = z[0]
 
-    c = dataset.class_labels
+    c = c or dataset.class_labels
 
     z_tsne = TSNE().fit_transform(z)
 
