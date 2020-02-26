@@ -497,7 +497,7 @@ def plot_latent(dataset, model, ax=None, **kwargs):
 
 def plot_reconstructions(dataset, model, figsize=(16, 20)):
 
-    x_hat = model.predict(data_scaled)
+    x_hat = model.predict(dataset.data_scaled)
 
     fig, ax = plt.subplots(1, 2, figsize=figsize)
     sns.heatmap(dataset.data_scaled, ax=ax[0])
