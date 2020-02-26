@@ -96,13 +96,13 @@ class AutoEncoder(tf.keras.Model):
         self.latent_dim = latent_dim
 
     def call(self, x):
-        z, _ = self.encode(x)
+        z, _ = self.encoder(x)
         return self.decode(z)
 
     
     def encode(self, x):
         mu, logvar = self.encoder(x)
-        return mu, logvar
+        return mu, _
 
     
     def decode(self, z):
@@ -234,7 +234,7 @@ class VaDE(tf.keras.Model):
             self.autoencoder.save_weights('weights/' + self.name + '_pretrained.h5')
             self.pretrain = False
         
-        z, _ = self.autoencoder.encode(X)
+        z = self.autoencoder.encode(X)
         print(self.n_components)
         self.fit_gmm(z.numpy())
         
@@ -482,4 +482,29 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     model(dataset.data_scaled)
     model.load_weights('weights/' + weights_filename)
     return dataset, model
+
+def plot_latent(dataset, model, ax=None, **kwargs):
+
+    ax = ax or plt.gca()
+
+    z = model.encode(dataset.data_scaled)
+    c = dataset.class_labels
+
+    z_tsne = TSNE().fit_transform(z)
+
+    ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
+    return ax
+
+def plot_reconstructions(dataset, model, figsize=(16, 20)):
+
+    x_hat = model.predict(data_scaled)
+
+    fig, ax = plt.subplots(1, 2, figsize=figsize)
+    sns.heatmap(dataset.data_scaled, ax=ax[0])
+    sns.heatmap(x_hat, ax=ax[1])
+
+    ax[0].set_title('Original Data')
+    ax[1].set_title('Reconstructed Data')
+
+    return ax
     
