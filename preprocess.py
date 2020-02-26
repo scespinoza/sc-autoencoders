@@ -35,9 +35,9 @@ class GSE:
 
     def load(self):
         if self.name == 'GSE103224':
-            self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=1, dtype='float32').drop("0", axis=1).T
+            self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=1).drop("0", axis=1).astype('float32').T
         else:
-            self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=0, dtype='float32').T
+            self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=0).astype('float32').T
         self.data_scaled = MinMaxScaler().fit_transform(self.data.values)
         self.cell_labels = self.data.index
 
