@@ -479,7 +479,7 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     dataset = GSE(name=dataset, class_name=class_name)
     
     model = models_dict[model](original_dim=dataset.n_genes)
-    model.build(input_shape=(None, dataset.n_genes))
+    model(dataset.data_scaled)
     model.load_weights('weights/' + weights_filename)
     return dataset, model
     
