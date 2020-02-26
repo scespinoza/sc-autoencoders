@@ -101,8 +101,8 @@ class AutoEncoder(tf.keras.Model):
 
     
     def encode(self, x):
-        mu, logvar = self.encoder(x)
-        return mu, _
+        mu, _ = self.encoder(x)
+        return mu
 
     
     def decode(self, z):
