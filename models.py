@@ -168,8 +168,6 @@ class SamplingLayer(layers.Layer):
         eps = tf.random.normal(shape=tf.shape(mu))
         return mu + tf.exp(logvar / 2) * eps
 
-
-
 class AutoEncoder(tf.keras.Model):
 
     """AutoEncoder
@@ -262,7 +260,6 @@ class AutoEncoder(tf.keras.Model):
 
         """
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
-
 
 class VAE(AutoEncoder):
     """
@@ -358,7 +355,6 @@ class VAE(AutoEncoder):
         reconstruction_loss = self.original_dim * losses.binary_crossentropy(x, x_hat)
         kl_loss = -0.5 * tf.reduce_sum((1 + logvar - tf.square(mu) - tf.exp(logvar)), axis=-1)
         return tf.reduce_mean(reconstruction_loss + kl_loss)
-
 
 class VaDE(tf.keras.Model):
     """
@@ -631,12 +627,6 @@ class VaDE(tf.keras.Model):
             print('k = {}, score = {:.2f}'.format(k, scores[k]))
         return max(scores, key=scores.get)
             
-        
-
-
-
-
-
 class ZIAutoEncoder(AutoEncoder):
 
     """
@@ -673,7 +663,6 @@ class ZIAutoEncoder(AutoEncoder):
     def decode(self, z):
         x = self.decoder(z)
         return self.zi(x)
-
 
 class ZIVAE(VAE):
     """
@@ -778,7 +767,6 @@ class TauAnnealing(tf.keras.callbacks.Callback):
             new_tau = min(tau0 * np.exp(-self.gamma * epoch), tau_min)
             zi.tau = new_tau
 
-
 class PlotLatentSpace(tf.keras.callbacks.Callback):
     """
     Keras callback to plot latent space using TSNE during training.
@@ -877,9 +865,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
         
         if epoch % self.interval == 0:
             self.plot(epoch, logs['loss'])
-
-    
-            
+          
 class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
 
     """
@@ -995,7 +981,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     if c is None:
         c = dataset.class_labels
 
-    z_tsne = TSNE().fit_transform(z)
+    z_tsne = TSNE(random_state=42).fit_transform(z)
 
     ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
     return ax
