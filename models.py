@@ -954,7 +954,7 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     model.load_weights('weights/' + weights_filename)
     return dataset, model
 
-def plot_latent(dataset, model, ax=None, c=None, **kwargs):
+def plot_latent(dataset, model, cell_names=None, ax=None, c=None, **kwargs):
     """
     Helper function to plot latent space from a dataset and model.
 
@@ -963,7 +963,9 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     dataset: GSE object.
         Dataset to plot.
     model: tf.keras.Model,
-        Model to generate latent space
+        Model to generate latent space.
+    cell_names: list of strings.
+        Labels of cells to plot.
     ax: plt.Axes, optional.
         Ax on which to plot latent space.
     c: array-like of ints, optional
@@ -991,7 +993,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     #radii = np.random.random(size=N) * 1.5
 
     TOOLTIPS=[
-        ('cell_name', '@cell_name')
+        ('cell_names', '@cell_names')
     ]
 
     colors = [
@@ -1004,11 +1006,14 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
 
+    if cell_names is None:
+        cell_names = list(dataset.cell_labels)
+
     source = ColumnDataSource(dict(
         x=list(z_tsne[:, 0]),
         y=list(z_tsne[:, 1]),
         colors=colors,
-        cell_name=list(dataset.cell_labels)))
+        cell_names=cell_names))
 
     p = figure(plot_height=9 * 60, plot_width=16 * 60, tools=TOOLS, tooltips=TOOLTIPS)
     p.circle('x', 'y', fill_color='colors', fill_alpha=0.6, line_color=None, size=8, source=source)
