@@ -982,7 +982,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     if c is None:
         c = dataset.class_labels
 
-    #z_tsne = TSNE(random_state=42).fit_transform(z)
+    z_tsne = TSNE(random_state=42).fit_transform(z)
 
     #ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
 
