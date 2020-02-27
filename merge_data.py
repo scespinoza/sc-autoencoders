@@ -5,7 +5,7 @@ import pandas as pd
 from functools import reduce
 from sklearn.preprocessing import MinMaxScaler
 
-gene_counts = pd.read_csv('gene_counts.txt', index_col=0)
+gene_counts = pd.read_csv('data/gene_counts.txt', index_col=0)
 selected_genes = list(gene_counts[gene_counts['Count'] == 8].index)
 
 excluded_datasets = ['GSE84465.txt', 'GSE132172_CB660.txt', 'GSE103224.txt']
@@ -21,10 +21,10 @@ def merge_datasets(dfs):
 
 dfs = []
 
-for filename in os.listdir('clean_data'):
+for filename in os.listdir('data'):
     if (not 'GSE' in filename) or (filename in excluded_datasets):
         continue
-    filepath = os.path.join('clean_data', filename)
+    filepath = os.path.join('data', filename)
     print('-' * 40)
     print(filename)
     if 'GSE103224' in filename:
