@@ -994,8 +994,6 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
         ('cell_name', '@cell_name')
     ]
 
-    source = ColumnDataSource(dict(cell_name=list(dataset.cell_labels)))
-
     colors = [
         all_palettes['Turbo'][256][i] for i in (255 // max(c)) * c 
     ]
@@ -1006,8 +1004,14 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
 
+    source = ColumnDataSource(dict(
+        x=list(z_tsne[:, 0]),
+        y=list(z_tsne[:, 1]),
+        colors=colors,
+        cell_name=list(dataset.cell_labels)))
+
     p = figure(plot_height=9 * 80, plot_width=16 * 80, tools=TOOLS, tooltips=TOOLTIPS)
-    p.circle(z_tsne[:, 0], z_tsne[:, 1], fill_color=colors, fill_alpha=0.6, line_color=None, size=8)
+    p.circle('x', 'y', fill_color='colors', fill_alpha=0.6, line_color=None, size=8, source=source)
     show(p)
     
 
