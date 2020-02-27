@@ -15,6 +15,7 @@ from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
 import seaborn as sns
 from preprocess import GSE
+from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure, output_file, output_notebook, show
 from bokeh.palettes import all_palettes
 
@@ -989,6 +990,12 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     #radii = np.random.random(size=N) * 1.5
 
+    TOOLTIPS=[
+        ('cell_name', '@cell_name')
+    ]
+
+    source = ColumnDataSource(dict(cell_name=dataset.cell_labels))
+
     colors = [
         all_palettes['Turbo'][256][i] for i in (255 // max(c)) * c 
     ]
@@ -999,7 +1006,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
 
-    p = figure(plot_height=9 * 50, plot_width=16 * 50, tools=TOOLS)
+    p = figure(plot_height=9 * 50, plot_width=16 * 50, tools=TOOLS, tooltpis=TOOLTIPS)
     p.circle(z_tsne[:, 0], z_tsne[:, 1], fill_color=colors, fill_alpha=0.6, line_color=None, size=8)
     show(p)
     
