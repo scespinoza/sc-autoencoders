@@ -15,6 +15,9 @@ from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
 import seaborn as sns
 from preprocess import GSE
+from bokeh.plotting import figure, output_file, show
+from bokeh.palettes import all_palettes
+
 
 class ZILayer(layers.Layer):
 
@@ -70,7 +73,6 @@ class ZILayer(layers.Layer):
         """
         eps=1e-20
         return -tf.math.log(-tf.math.log(tf.random.uniform(shape=shape) + eps) + eps)
-
 
 class Encoder(layers.Layer):
 
@@ -971,8 +973,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     ax: axis
     """
 
-    ax = ax or plt.gca()
-
+    #ax = ax or plt.gca()    
     z = model.encode(dataset.data_scaled)
 
     if isinstance(z, tuple):
@@ -981,10 +982,23 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     if c is None:
         c = dataset.class_labels
 
-    z_tsne = TSNE(random_state=42).fit_transform(z)
+    #z_tsne = TSNE(random_state=42).fit_transform(z)
 
-    ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
-    return ax
+    #ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
+
+    radii = np.random.random(size=N) * 1.5
+
+    colors = [
+        all_palettes['Turbo256'][i] for i in (265 // max(c)) * c 
+    ]
+
+    output_file(model.name + ".html", title=model.name + ' - Latent Space', mode="cdn")
+
+    TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
+
+    p = figure(tools=TOOLS)
+    p.circle(x, y, fill_color=colors, fill_alpha=0.6, line_color=None)
+    
 
 def plot_reconstructions(dataset, model, figsize=(16, 20)):
 
