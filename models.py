@@ -1006,7 +1006,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
 
-    p = figure(plot_height=9 * 50, plot_width=16 * 50, tools=TOOLS, tooltpis=TOOLTIPS)
+    p = figure(plot_height=9 * 100, plot_width=16 * 100, tools=TOOLS, tooltips=TOOLTIPS)
     p.circle(z_tsne[:, 0], z_tsne[:, 1], fill_color=colors, fill_alpha=0.6, line_color=None, size=8)
     show(p)
     
