@@ -944,10 +944,11 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     model: tf.keras.models.Model,
         Trained model.
     """
-    weights_filename = dataset + '_' + class_name + '_' + model + '_trained.h5'
+    name = dataset + '_' + class_name + '_' + model
+    weights_filename = name + '_trained.h5'
     dataset = GSE(name=dataset, class_name=class_name)
     
-    model = models_dict[model](original_dim=dataset.n_genes)
+    model = models_dict[model](original_dim=dataset.n_genes, name=name)
     model(dataset.data_scaled)
     model.load_weights('weights/' + weights_filename)
     return dataset, model
