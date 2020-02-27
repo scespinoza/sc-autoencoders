@@ -986,7 +986,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     #ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
 
-    radii = np.random.random(size=N) * 1.5
+    #radii = np.random.random(size=N) * 1.5
 
     colors = [
         all_palettes['Turbo256'][i] for i in (265 // max(c)) * c 
