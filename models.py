@@ -843,7 +843,7 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             fig, ax = plt.subplots()
 
             title = 'epoch = {}, loss = {:.2f}'.format(epoch, loss)
-            ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=self.c, cmap='rainbow', alpha=0.6)
+            ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=self.c, cmap='rainbow', alpha=0.6, s=5)
             ax.set_title(title)
             fig.savefig('figures/' + self.model.name + "/epoch_{}.png".format(epoch))
             plt.close(fig)
