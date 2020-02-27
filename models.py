@@ -997,7 +997,8 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
 
     p = figure(tools=TOOLS)
-    p.circle(x, y, fill_color=colors, fill_alpha=0.6, line_color=None)
+    p.circle(z_tsne[:, 0], z_tsne[:, 1], fill_color=colors, fill_alpha=0.6, line_color=None)
+    show(p)
     
 
 def plot_reconstructions(dataset, model, figsize=(16, 20)):
