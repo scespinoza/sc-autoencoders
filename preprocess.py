@@ -48,7 +48,7 @@ class GSE:
         if self.name in ['GSE84465', 'GSE57872']:
             self.class_labels = LabelEncoder().fit_transform(get_metadata(self.name, self.class_name))
         else:
-            self.class_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.get_classes[self.name]))
+            self.class_labels = LabelEncoder().fit_transform(self.data.index.map(GSE.get_classes[self.name]).astype('str'))
             
         self.n_cells = self.data.shape[0]
         self.n_genes = self.data.shape[1]
