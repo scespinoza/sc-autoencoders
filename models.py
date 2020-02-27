@@ -994,7 +994,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
         ('cell_name', '@cell_name')
     ]
 
-    source = ColumnDataSource(dict(cell_name=dataset.cell_labels.values))
+    source = ColumnDataSource(dict(cell_name=list(dataset.cell_labels)))
 
     colors = [
         all_palettes['Turbo'][256][i] for i in (255 // max(c)) * c 
