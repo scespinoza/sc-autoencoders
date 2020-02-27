@@ -16,9 +16,26 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from preprocess import GSE
 
-
-
 class ZILayer(layers.Layer):
+
+    """
+    TensorFlow 2 implementation of a Zero Inflated layer with gumbel sampling.
+    See: https://doi.org/10.1016/j.gpb.2018.08.003 for reference
+
+    Parameters
+    ----------
+    tau: float. 
+        Initial tau for annealing procedure.
+    Attributes
+    ----------
+    tau0: float
+        Initial tau for annealing procedure.
+    tau: float
+        Current tau.
+    tau_min: float
+        Minimum tau for annealing procedure.
+
+    """
 
     def __init__(self, tau=1., name='zi'):
         super(ZILayer, self).__init__(name=name)
@@ -38,11 +55,48 @@ class ZILayer(layers.Layer):
     
     @classmethod
     def gumbel(cls, shape=None):
+        """
+        Sample from a gumbel distribution.
+        
+        Parameters
+        ----------
+        shape: tuple.
+            Shape of the sampling vector.
+        
+        Returns
+        -------
+        gumbel_sample: array-like of shape 'shape'
+            Gumbel samples.
+        """
         eps=1e-20
         return -tf.math.log(-tf.math.log(tf.random.uniform(shape=shape) + eps) + eps)
 
 
 class Encoder(layers.Layer):
+
+    """
+    TensorFlow 2 implementation of an Encoder suitable for AE, VAE and VaDE.
+
+    Parameters
+    ----------
+    original_dim: int.
+        Number of input dimensions.
+    latent_dim: int.
+        Number of dimensions of the latent space.
+    name: str.
+        Layer name.
+
+    Attributes
+    ----------
+    h1: Layer.
+        First hidden layer.
+    h2: Layer.
+        Second hidden layer.
+    mu_dense: Layer.
+        Layer for mu estimation
+    logvar_dense: Layer.
+        Layer for log(Var(z)) estimation
+    """
 
     def __init__(self, original_dim=5491, latent_dim=10, name='Encoder'):
         super(Encoder, self).__init__(name=name)
@@ -60,6 +114,30 @@ class Encoder(layers.Layer):
 
 class Decoder(layers.Layer):
 
+    """
+    TensorFlow 2 implementation of an Encoder suitable for AE, VAE and VaDE.
+
+    Parameters
+    ----------
+    original_dim: int.
+        Number of input dimensions.
+    latent_dim: int.
+        Number of dimensions of the latent space.
+    name: str.
+        Layer name.
+
+    Attributes
+    ----------
+    h1: Layer.
+        First hidden layer.
+    h2: Layer.
+        Second hidden layer.
+    h3: Layer.
+        Second hidden layer.
+    output: Layer.
+        Output layer.
+    """
+
     def __init__(self, original_dim=5491, latent_dim=10, name='Decoder'):
         super(Decoder, self).__init__(name=name)
         self.original_dim = original_dim
@@ -76,6 +154,11 @@ class Decoder(layers.Layer):
         return self.outputs(x)
 
 class SamplingLayer(layers.Layer):
+
+    """
+    TensorFlow 2 implementation of a sampling layer for VAE and VaDE.
+    It implements the reparametrization trick z = mu + exp(logvar / 2) * eps
+    """
 
     def __init__(self, name='Sampling'):
         super(SamplingLayer, self).__init__(name=name)
@@ -122,9 +205,9 @@ class AutoEncoder(tf.keras.Model):
         self.latent_dim = latent_dim
 
     def call(self, x):
-        # This will throw a warning when training the stacked autoencoder.
-        # The call is implemented this way in order to reuse the code for the VAE an VaDE.
-        # The warning should not be an important issue when training the stacked autoencoder.
+        # This will throw a warning when training the stacked autoencoder. The call is implemented 
+        # this way in order to reuse the code for the VAE an VaDE. The warning should not be an 
+        # important issue when training the stacked autoencoder.
         z, _ = self.encoder(x)
         return self.decode(z)
 
@@ -556,6 +639,21 @@ class VaDE(tf.keras.Model):
 
 class ZIAutoEncoder(AutoEncoder):
 
+    """
+    TensorFlow 2 implementation of a stacked autoencoder with Zero-Inflation layer.
+    See: https://doi.org/10.1016/j.gpb.2018.08.003 for reference
+
+    Parameters
+    ----------
+    dropout: float,
+        Dropout rate for first hidden layer.
+    tau: float,
+        Initial temperature for the annealing procedure of the ZI Layer.
+    *args: *args to pass to parent constructor.
+    **kwargs: **kwargs to pass to parent constructor.
+    """
+    
+
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
         super(ZIAutoEncoder, self).__init__( *args, **kwargs)
@@ -578,6 +676,19 @@ class ZIAutoEncoder(AutoEncoder):
 
 
 class ZIVAE(VAE):
+    """
+    TensorFlow 2 implementation of a VAE with Zero-Inflation layer.
+    See: https://doi.org/10.1016/j.gpb.2018.08.003 for reference
+
+    Parameters
+    ----------
+    dropout: float,
+        Dropout rate for first hidden layer.
+    tau: float,
+        Initial temperature for the annealing procedure of the ZI Layer.
+    *args: *args to pass to parent constructor.
+    **kwargs: **kwargs to pass to parent constructor.
+    """
 
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
@@ -595,6 +706,19 @@ class ZIVAE(VAE):
         return x_hat
 
 class ZIVaDE(VaDE):
+    """
+    TensorFlow 2 implementation of a VaDE with Zero-Inflation layer.
+    See: https://doi.org/10.1016/j.gpb.2018.08.003 for reference
+
+    Parameters
+    ----------
+    dropout: float,
+        Dropout rate for first hidden layer.
+    tau: float,
+        Initial temperature for the annealing procedure of the ZI Layer.
+    *args: *args to pass to parent constructor.
+    **kwargs: **kwargs to pass to parent constructor.
+    """
     def __init__(self, dropout=0.5, tau=0.5, *args, **kwargs):
 
         super(ZIVaDE, self).__init__( *args, **kwargs)
@@ -618,6 +742,10 @@ class ZIVaDE(VaDE):
         return x_hat
 
 class WarmUpCallback(tf.keras.callbacks.Callback):
+    """
+    Keras callback to modify the weight of log(p(z|c)) in the VaDE loss function.
+    EXPERIMENTAL
+    """
 
     def __init__(self, k=0, b=0.001):
         self.k = k
@@ -628,6 +756,12 @@ class WarmUpCallback(tf.keras.callbacks.Callback):
             self.model.k = self.k + epoch * self.b
 
 class TauAnnealing(tf.keras.callbacks.Callback):
+
+    """
+    Keras callback to perform the tau annealing procedure on the ZI Layer.
+    See: https://doi.org/10.1016/j.gpb.2018.08.003 for reference
+
+    """
 
     def __init__(self, gamma=3e-4):
         self.gamma = gamma
@@ -646,6 +780,31 @@ class TauAnnealing(tf.keras.callbacks.Callback):
 
 
 class PlotLatentSpace(tf.keras.callbacks.Callback):
+    """
+    Keras callback to plot latent space using TSNE during training.
+
+    Parameters
+    ----------
+    X: array-like of shape (None, original_dim).
+        Data to plot on latent space.
+    c: array-like of ints and shape (original_dim,).
+        Encodings to color points on latent space.
+    interval: int.
+        Interval of trianing epochs to plot latent space.
+    random_state: int.
+        Random state for TSNE
+
+    Attributes
+    ----------
+    X: array-like of shape (None, original_dim).
+        Data to plot on latent space.
+    c: array-like of ints and shape (original_dim,).
+        Encodings to color points on latent space.
+    interval: int.
+        Interval of trianing epochs to plot latent space.
+    random_state: int.
+        Random state for TSNE
+    """
 
     def __init__(self, X, c=None, interval=20, random_state=42):
         self.X = X
@@ -654,6 +813,16 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
         self.random_state = random_state
 
     def plot(self, epoch, loss=None):
+        """
+        Plot latent space.
+
+        Parameters
+        ----------
+        epoch: int,
+            Current epoch.
+        loss: dict,
+            Loss dictionary.
+        """
         loss = loss or 0.
         z = self.model.encode(self.X)
         if len(z) == 2:
@@ -713,6 +882,10 @@ class PlotLatentSpace(tf.keras.callbacks.Callback):
             
 class PrintLossAndAccuracy(tf.keras.callbacks.Callback):
 
+    """
+    Keras Callback to plot loss and custom accuracy in VaDE training.
+    """
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -755,6 +928,34 @@ models_dict = {
 }
 
 def load_weights(dataset, model, class_name='', n_classes=0):
+    """
+    Helper function to load trained model.
+
+    Parameters
+    ----------
+    dataset: string.
+        A GSE dataset name.
+    model: str one of {'stacked', 'vae', 'vade', 'zi_stacked', 'zi_vae', 'zi_vade'}
+        String describing model to load.
+
+        'stacked': Stacked AutoEncoder
+        'vae': Variational AutoEncoder
+        'vade': Variational Deep Embedding
+        'zi_stacked': Zero-Inflated Stacked AutoEncoder
+        'zi_vae': Zero-Inflated Variational AutoEncoder
+        'zi_vade': Zero-Inflated Variational Deep Embedding
+    class_name: str,
+        Class name. Only for datasets GSE57872 and GSE84465.
+    n_classes: int
+        Number of classes of VaDE.
+
+    Returns
+    -------
+    dataset: GSE object,
+        Data for trained model.
+    model: tf.keras.models.Model,
+        Trained model.
+    """
     weights_filename = dataset + '_' + class_name + '_' + model + '_trained.h5'
     dataset = GSE(name=dataset, class_name=class_name)
     
@@ -764,6 +965,25 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     return dataset, model
 
 def plot_latent(dataset, model, ax=None, c=None, **kwargs):
+    """
+    Helper function to plot latent space from a dataset and model.
+
+    Parameters
+    ----------
+    dataset: GSE object.
+        Dataset to plot.
+    model: tf.keras.Model,
+        Model to generate latent space
+    ax: plt.Axes, optional.
+        Ax on which to plot latent space.
+    c: array-like of ints, optional
+        Encoding to colour points in latent space.
+    **kwargs: kwargs to pass to plt.scatter
+
+    Returns
+    -------
+    ax: axis
+    """
 
     ax = ax or plt.gca()
 
@@ -781,6 +1001,21 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     return ax
 
 def plot_reconstructions(dataset, model, figsize=(16, 20)):
+
+    """
+    Helper function to plot reconstructions.
+
+    Parameters
+    ----------
+    dataset: GSE object.
+        Dataset to plot.
+    model: tf.keras.Model,
+        Model to generate latent space
+
+    Returns
+    -------
+    ax: axis
+    """
 
     x_hat = model.predict(dataset.data_scaled)
 

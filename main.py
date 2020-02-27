@@ -30,6 +30,14 @@ losses = {
 
 
 def load_data(args):
+        """
+    Helper function to train a model.
+
+    Parameters
+    ----------
+    args: Namespace,
+        Arguments for loading data.
+    """
     if args.model == 'vade' and args.dataset in ['GSE57872', 'GSE84465']:
         assert args.class_name != '', "Must provide a class name."
 
@@ -55,7 +63,14 @@ def load_data(args):
     return (x_train, x_test), (y_train, y_test), n_components, dataset
 
 def train_model(args):
+    """
+    Helper function to train a model.
 
+    Parameters
+    ----------
+    args: Namespace,
+        Arguments for training model.
+    """
     name = args.dataset + '_' + args.class_name + '_' + args.model
     x, y, n_components, dataset = load_data(args)
 
@@ -110,6 +125,18 @@ def train_model(args):
 
 
 def plot_output(args, history, name):
+    """
+    Helper function to plot training outputs.
+
+    Parameters
+    ----------
+    args: Namespace,
+        Contains the training parameters of the model.
+    history: dict,
+        Dictionary containing the training history.
+    name: str,
+        Model name.
+    """
     history_df = pd.DataFrame.from_dict(history.history)
     history_df.to_csv('results/' + name + '_history.csv', index=False, sep='\t')
     training_loss = history.history['loss']
