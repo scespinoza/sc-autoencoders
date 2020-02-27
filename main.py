@@ -30,7 +30,7 @@ losses = {
 
 
 def load_data(args):
-        """
+    """
     Helper function to train a model.
 
     Parameters
