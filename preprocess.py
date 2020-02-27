@@ -8,6 +8,37 @@ def get_metadata(dataset, column='Cell_type'):
     return list(metadata[column])
 
 class GSE:
+    """
+    Class to load gene expression datasets from GEO
+
+    Parameters
+    ----------
+
+    name: str
+        Name of the dataset to load.
+    class_name: str, optional
+        Class name of cells. Only for datasets GSE57872 and GSE84465. 
+        'class_name' must be a column on the metadata file (tipically patient_id or Cell_type).
+
+    Attributes
+    ----------
+    name: str
+        Dataset name.
+    n_genes: int
+        Number of genes in the dataset.
+    n_cells: int
+        Number of cells in the dataset.
+    class_name: str
+        Class name of cells.
+    data: DataFrame
+        Original dataset.
+    data_scaled: DataFrame
+        Min-max scaled dataset.
+    cell_labels: Index
+        Original cell labels.
+    class_labels: ndarray
+        Encoded class labels.    
+    """
 
     get_classes = {
         'GSE57872': get_metadata,
@@ -56,6 +87,9 @@ class GSE:
         return self
 
     def split(self):
+        """
+        Split dataset on train and test set.
+        """
         x = self.data_scaled
         y = self.class_labels
         x_train, x_test, y_train, y_test = train_test_split(x, y)

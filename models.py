@@ -89,6 +89,31 @@ class SamplingLayer(layers.Layer):
 
 class AutoEncoder(tf.keras.Model):
 
+    """AutoEncoder
+    TensorFlow 2 implementation of a stacked autoencoder.
+
+    Parameters
+    ----------
+    original_dim: int, defaults to 5491.
+        Number of input dimensions.
+    latent_dim: int, defaults to 10.
+        Number of latent dimensions.
+    name: str, optional
+        Model name.
+
+    Attributes
+    ----------
+    encoder: Encoder,
+        Encoder part of the AutoEncoder.
+    decoder: Decoder,
+        Decoder part of the AutoEncoder.
+    original_dim: int
+        Number of input dimensions.
+    latent_dim: int
+        Number of latent dimensions.
+        
+    """
+
     def __init__(self, original_dim=5491, latent_dim=10, name='AutoEncoder'):
         super(AutoEncoder, self).__init__(name=name)
         self.encoder = Encoder(original_dim=original_dim, latent_dim=latent_dim)
@@ -97,23 +122,93 @@ class AutoEncoder(tf.keras.Model):
         self.latent_dim = latent_dim
 
     def call(self, x):
+        # This will throw a warning when training the stacked autoencoder.
+        # The call is implemented this way in order to reuse the code for the VAE an VaDE.
+        # The warning should not be an important issue when training the stacked autoencoder.
         z, _ = self.encoder(x)
         return self.decode(z)
 
     
     def encode(self, x):
+        """
+        Encode the input x.
+
+        Parameters
+        ----------
+        x: array-like of shape (None, input_dim)
+            Original data
+
+        Returns
+        -------
+        mu, logvar: tuple of Tensors each of shape (None, latent_dim)
+            Mean and Logvar for the z distribution. In the case of the stacked autoencoder,
+            use only the Mean Tensor.
+        """
         mu, logvar = self.encoder(x)
         return mu, logvar
 
     
     def decode(self, z):
+        """
+        Decode the latent vector z.
+
+        Parameters
+        ----------
+        z: array-like of shape (None, latent_dim)
+
+        Returns
+        -------
+        x_hat: Tensor of shape (None, original_dim)
+        """
         return self.decoder(z)
 
     def reconstruction_loss(self, x, x_hat):
+        """
+        Reconstruction loss.
+        
+        Parameters
+        ----------
+        x: Tensor or array-like of shape (None, original_dim).
+            Original Data.
+        x_hat: Tensor or array-like of shape (None, original_dim).
+
+        Returns
+        -------
+        reconstruction_loss: float.
+            Reconstruction loss.
+
+        """
         return self.original_dim * losses.binary_crossentropy(x, x_hat)
 
 
 class VAE(AutoEncoder):
+    """
+    TensorFlow 2 implementation of a Variational AutoEncoder (VAE).
+
+    Parameters
+    ----------
+
+    original_dim: int, defaults to 5491.
+        Number of input dimensions.
+    latent_dim: int, defaults to 10.
+        Number of latent dimensions.
+    name: str.
+        Model Name.
+
+    Attributes
+    ----------
+    encoder: Encoder,
+        Encoder part of the AutoEncoder.
+    decoder: Decoder,
+        Decoder part of the AutoEncoder.
+    original_dim: int
+        Number of input dimensions.
+    latent_dim: int
+        Number of latent dimensions.
+    sampling: SamplingLayer,
+        Layer that contains the sampling procedure (reparametrization trick) of VAE.
+    
+    """
 
     def __init__(self, original_dim=5491, latent_dim=10, name='VAE'):
         super(VAE, self).__init__(original_dim=original_dim,
@@ -131,15 +226,51 @@ class VAE(AutoEncoder):
 
     
     def encode(self, x):
+        """
+        Encode the x vector.
+
+        Parameters
+        ----------
+        x: Tensor or array-like of shape (None, input_dim)
+            Original Data.
+        
+        Returns
+        -------
+        z: Tensor of shape (None, latent_dim)
+            Latent encodings of x.
+        """
         mu, logvar = self.encoder(x)
         return self.sampling([mu, logvar])
     
     
     def decode(self, z):
+        """
+        Decode the latent vector z.
+
+        Parameters
+        ----------
+        z: Tensor or array-like of shape (None, latent_dim)
+            Latent vector.
+        Returns
+        -------
+        x_hat: Tensor of shape (None, original_dim)
+            Reconstructions of the latent vector z.
+        """
         return self.decoder(z)
 
 
     def vae_loss(self, inputs):
+        """
+        Variational AutoEncoder loss.
+
+        Parameters
+        ----------
+        inputs: tuple of tensors (x, mu, logvar, x_hat).
+
+        Returns
+        vae_loss: float.
+            Reconstruction loss + KL loss.
+        """
         x, mu, logvar, x_hat = inputs
         reconstruction_loss = self.original_dim * losses.binary_crossentropy(x, x_hat)
         kl_loss = -0.5 * tf.reduce_sum((1 + logvar - tf.square(mu) - tf.exp(logvar)), axis=-1)
@@ -147,6 +278,63 @@ class VAE(AutoEncoder):
 
 
 class VaDE(tf.keras.Model):
+    """
+    TensorFlow 2 implementation of a Variational Deep Embedding(VaDE).
+    Based on: https://github.com/mperezcarrasco/Pytorch-VaDE
+
+    Parameters
+    ----------
+
+    original_dim: int, defaults to 5491.
+        Number of input dimensions.
+    latent_dim: int, defaults to 10.
+        Number of latent dimensions.
+    n_components: int, defaults to 6.
+        Number of components for the GMM.
+    pretrain: int, defaults to 0.
+        Number of epochs of pretraining. If 0, it assumes 
+        that there is a file with already pretrained weights.
+    pretrain_lr: float, defaults to 1e-4.
+        Learning rate for the pretraining of the stacked autoencoder.
+    k: float, defaults to 1.
+        Weight for log(p(z|c)) in the loss function.
+    search_k: bool, default to False.
+        If true it search for the optimal number of components of the GMM
+        in the stacked autoencoder latent space using a silhouette coefficient.
+    name: str.
+        Model Name.
+
+    Attributes
+    ----------
+    original_dim: int
+        Number of input dimensions.
+    latent_dim: int
+        Number of latent dimensions.
+    n_components: int.
+        Number of components of the GMM.
+    gmm: GaussianMixture
+        Instance of sklearn's GaussianMixture estimator.
+    autoencoder: AutoEncoder,
+        Base stacked autoencoder.
+    pretrain: int, defaults to 0.
+        Number of epochs of pretraining. If 0, it assumes 
+        that there is a file with already pretrained weights.
+    pretrain_lr: float, defaults to 1e-4.
+        Learning rate for the pretraining of the stacked autoencoder.
+    pi_prior: tf.Variable, of shape (n_components,)
+        Values of prior p(c).
+    mu_prior: tf.Variable of shape (n_components, latent_dim)
+        Mean values of each GMM component in the latent space.
+    logvar_prior: tf.Variable of shape (n_components, latent_dim)
+        Log of the var values of each GMM component in the latent space.
+    sampling: SamplingLayer,
+        Layer that contains the sampling procedure (reparametrization trick) of VAE.
+    k: float, defaults to 1.
+        Weight for log(p(z|c)) in the loss function.
+    search_k: bool, default to False.
+        If true it search for the optimal number of components of the GMM
+        in the stacked autoencoder latent space using a silhouette coefficient.
+    """
 
     def __init__(self,
                  original_dim=5491,
@@ -190,10 +378,35 @@ class VaDE(tf.keras.Model):
 
     @tf.function
     def encode(self, x):
+        """
+        Encode the x vector.
+
+        Parameters
+        ----------
+        x: Tensor or array-like of shape (None, input_dim)
+            Original Data.
+        
+        Returns
+        -------
+        z: Tensor of shape (None, latent_dim)
+            Latent encodings of x.
+        """
         mu, logvar = self.autoencoder.encoder(x)
         return self.sampling([mu, logvar])
 
     def predict_cluster(self, x):
+        """
+        Predict cluster with the GMM model.
+
+        Parameters
+        ----------
+        x: Tensor or array-like of shape (None, input_dim)
+            Original data.
+        Returns
+        -------
+        classes: Tensor of shape (None,)
+            Predicted classes.
+        """
         z, _ = self.encode(x)
         gamma = self.compute_gamma(z)
         return tf.argmax(gamma, axis=1)
@@ -204,6 +417,17 @@ class VaDE(tf.keras.Model):
 
     
     def vade_loss(self, inputs):
+        """
+        Variational AutoEncoder loss.
+
+        Parameters
+        ----------
+        inputs: tuple of tensors (x, mu, logvar, z, x_hat).
+
+        Returns
+        vae_loss: float.
+            Reconstruction loss + KL loss.
+        """
         x, mu, logvar, z, x_hat = inputs
         p_c = self.pi_prior
         gamma = self.compute_gamma(z)
@@ -219,6 +443,19 @@ class VaDE(tf.keras.Model):
         return loss
 
     def compute_gamma(self, z):
+        """
+        Compute q(c|x).
+
+        Parameters
+        ----------
+        z: Tensor or array-like of shape (None, latent_dim)
+            Latent vector.
+        
+        Returns
+        -------
+        gamma: Tensor of shape (None, n_components).
+            q(c|x) probs for z latent vector.
+        """
         p_c = self.pi_prior
         #print(p_c)
         h = ((tf.expand_dims(z, axis=1) - self.mu_prior)  ** 2) /  tf.exp(self.logvar_prior)
@@ -229,6 +466,22 @@ class VaDE(tf.keras.Model):
         return p_z_c / tf.reduce_sum(p_z_c, axis=1, keepdims=True)
 
     def fit(self, X, y, **kwargs):
+        """
+        Implements pretrain and train routines for VaDE.
+
+        Parameter
+        ---------
+        X: vector-like of shape (None, original_dim)
+            Input.
+        y: vector-like of shape (None, original_dim)
+            Target.
+        **kwargs: kwargs to pass to parent's fit function.
+
+        Returns
+        -------
+        history: dict,
+            History of loss and other metrics for each epoch.
+        """
         if self.pretrain:
             self.autoencoder.compile(optimizer=optimizers.Adam(self.pretrain_lr), loss='binary_crossentropy')
             self.autoencoder.fit(X, X, epochs=self.pretrain)
@@ -246,10 +499,21 @@ class VaDE(tf.keras.Model):
             
 
     def load_pretrained(self):
+        """
+        Load pretrained weights of the stacked autoencoder.
+        """
         self.autoencoder.build(input_shape=(None, self.original_dim))
         self.autoencoder.load_weights('weights/' + self.name + '_pretrained.h5')
 
     def fit_gmm(self, X):
+        """
+        Fit Gaussian Mixture Model on the stacked autoencoder latent space.
+        
+        Parameters
+        ----------
+        X: Tensor or array-like of shape (None, original_dim)
+            Data to fit GMM.
+        """
         if self.search_k:
             print('Searching K')
             self.n_components = self.select_k(X)
@@ -261,6 +525,21 @@ class VaDE(tf.keras.Model):
         self.logvar_prior = tf.Variable(np.log(self.gmm.covariances_), dtype=tf.float32)
 
     def select_k(self, X, klims=(2, 20)):
+        """
+        Search for optimal number of components for the GMM on the stacked autoencoder
+        latent space.
+                
+        Parameters
+        ----------
+        X: Tensor or array-like of shape (None, original_dim)
+            Data to fit GMM.
+        klims: tuple of len 2.
+            Min and max number of components to test.
+
+        Returns
+        -------
+        best_k: best number of components according to silhouette score.
+        """
         scores = {}
         for k in range(*klims):
             gmm = GaussianMixture(n_components=k, covariance_type='diag')
