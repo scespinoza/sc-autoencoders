@@ -1016,7 +1016,7 @@ def plot_latent(dataset, model, cell_names=None, ax=None, c=None, **kwargs):
         colors=colors,
         cell_names=cell_names))
 
-    p = figure(plot_height=9 * 70, plot_width=16 * 70, tools=TOOLS, tooltips=TOOLTIPS)
+    p = figure(plot_height=9 * 80, plot_width=16 * 80, tools=TOOLS, tooltips=TOOLTIPS)
     p.circle('x', 'y', fill_color='colors', fill_alpha=0.6, line_color=None, size=8, source=source)
     show(p)
     
