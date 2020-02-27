@@ -15,7 +15,7 @@ from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
 import seaborn as sns
 from preprocess import GSE
-from bokeh.plotting import figure, output_file, show
+from bokeh.plotting import figure, output_file, output_notebook, show
 from bokeh.palettes import all_palettes
 
 
@@ -995,10 +995,12 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     output_file(model.name + ".html", title=model.name + ' - Latent Space', mode="cdn")
 
+    output_notebook()
+
     TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
 
-    p = figure(tools=TOOLS)
-    p.circle(z_tsne[:, 0], z_tsne[:, 1], fill_color=colors, fill_alpha=0.6, line_color=None, size=10)
+    p = figure(plot_height=9 * 50, plot_width=16 * 50, tools=TOOLS)
+    p.circle(z_tsne[:, 0], z_tsne[:, 1], fill_color=colors, fill_alpha=0.6, line_color=None, size=8)
     show(p)
     
 
