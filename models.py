@@ -989,7 +989,7 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     #radii = np.random.random(size=N) * 1.5
 
     colors = [
-        all_palettes['Turbo256'][i] for i in (265 // max(c)) * c 
+        all_palettes['Turbo'][256][i] for i in (265 // max(c)) * c 
     ]
 
     output_file(model.name + ".html", title=model.name + ' - Latent Space', mode="cdn")
