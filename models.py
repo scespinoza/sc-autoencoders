@@ -995,9 +995,10 @@ def plot_latent(dataset, model, cell_names=None, ax=None, c=None, **kwargs):
     TOOLTIPS=[
         ('cell_names', '@cell_names')
     ]
-
+    cmap = plt.cm.get_cmap('rainbow')
+    
     colors = [
-        all_palettes['Turbo'][256][i] for i in (255 // max(c)) * c 
+        "#%02x%02x%02x" % tuple((np.array(cmap(i)[:3]) * 255).astype(int)) for i in (255 // max(c)) * c]
     ]
 
     output_file('bokeh_plots/' + model.name + ".html", title=model.name + ' - Latent Space', mode="cdn")
