@@ -1000,7 +1000,7 @@ def plot_latent(dataset, model, cell_names=None, ax=None, c=None, **kwargs):
         all_palettes['Turbo'][256][i] for i in (255 // max(c)) * c 
     ]
 
-    output_file(model.name + ".html", title=model.name + ' - Latent Space', mode="cdn")
+    output_file('bokeh_plots/' + model.name + ".html", title=model.name + ' - Latent Space', mode="cdn")
 
     output_notebook()
 
