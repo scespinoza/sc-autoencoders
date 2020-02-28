@@ -954,7 +954,7 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     model.load_weights('weights/' + weights_filename)
     return dataset, model
 
-def plot_latent(dataset, model, cell_names=None, ax=None, c=None, **kwargs):
+def plot_latent(dataset, model, cell_names=None, suffix='', ax=None, c=None):
     """
     Helper function to plot latent space from a dataset and model.
 
@@ -966,18 +966,16 @@ def plot_latent(dataset, model, cell_names=None, ax=None, c=None, **kwargs):
         Model to generate latent space.
     cell_names: list of strings.
         Labels of cells to plot.
-    ax: plt.Axes, optional.
-        Ax on which to plot latent space.
+    suffix: str
+        Suffix of output file name.
     c: array-like of ints, optional
         Encoding to colour points in latent space.
-    **kwargs: kwargs to pass to plt.scatter
 
     Returns
     -------
     ax: axis
     """
 
-    #ax = ax or plt.gca()    
     z = model.encode(dataset.data_scaled)
 
     if isinstance(z, tuple):
@@ -988,9 +986,6 @@ def plot_latent(dataset, model, cell_names=None, ax=None, c=None, **kwargs):
 
     z_tsne = TSNE(random_state=42).fit_transform(z)
 
-    #ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
-
-    #radii = np.random.random(size=N) * 1.5
 
     TOOLTIPS=[
         ('cell_names', '@cell_names')
