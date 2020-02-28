@@ -166,15 +166,15 @@ if __name__ == '__main__':
     parser.add_argument('--interval', type=int, default=20, help='interval (epochs) to plot latent space')
     parser.add_argument('--model', type=str, default='vade', help='model to train')
     parser.add_argument('--pretrain', type=int, default=0, help='pretrain vade')
-    parser.add_argument('--pretrain_lr', type=float, default=3e-4, help='pretrain_lr')
-    parser.add_argument('--verbose', action='store_true')
-    parser.add_argument('--components', type=int, default=0, help='GMM components')
+    parser.add_argument('--pretrain_lr', type=float, default=3e-4, help='pretrain_lr') # VaDE
+    parser.add_argument('--verbose', action='store_true') # use this for stacked and VAE
+    parser.add_argument('--components', type=int, default=0, help='GMM components') # VaDE
     parser.add_argument('--lr_interval', type=int, default=10, help='interval for lr update')
     parser.add_argument('--decay', type=float, default=0.99)
     parser.add_argument('--class_name', type=str, default='', help='class to do clustering. only for datasets GSE84465 and GSE57872')
-    parser.add_argument('--k', type=float, default=1., help='initial contribution of vade loss')
-    parser.add_argument('--warmup', action='store_true', help='warmup for kappa parameter')
-    parser.add_argument('--search_k', action='store_true', help='search for best k in the latent space')
+    parser.add_argument('--k', type=float, default=1., help='weight for log q(c|x)') # VaDE. 10 works for GSE57872
+    parser.add_argument('--warmup', action='store_true', help='warmup for kappa parameter') # EXPERIMENTAL
+    parser.add_argument('--search_k', action='store_true', help='search for best k in the latent space') # VaDE
 
     args = parser.parse_args()
 
