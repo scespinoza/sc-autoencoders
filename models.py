@@ -1033,7 +1033,7 @@ def plot_latent(dataset, model, cell_names=None, suffix='', ax=None, c=None):
     p = figure(plot_height=9 * 50, plot_width=16 * 50, tools=TOOLS, tooltips=TOOLTIPS)
     p.circle('x', 'y', fill_color='colors', fill_alpha=0.6, line_color=None, size=8, source=source)
     plot = column(p, savebutton)
-    show(p)
+    show(plot)
     
 
 def plot_reconstructions(dataset, model, figsize=(16, 20)):
