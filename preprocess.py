@@ -68,7 +68,7 @@ class GSE:
     def load(self):
         if self.name == 'GSE103224':
             self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=1).drop("0", axis=1).astype('float32').T
-        elif self.name == 'full_data':
+        elif 'all_data' in self.name:
              self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col='tumor').drop(["cell", "dataset"], axis=1).astype('float32')
 
         else:
