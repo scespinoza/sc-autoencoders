@@ -15,6 +15,10 @@ from scipy.optimize import linear_sum_assignment
 import matplotlib.pyplot as plt
 import seaborn as sns
 from preprocess import GSE
+from bokeh.models import ColumnDataSource
+from bokeh.plotting import figure, output_file, output_notebook, show
+from bokeh.palettes import all_palettes
+
 
 class ZILayer(layers.Layer):
 
@@ -70,7 +74,6 @@ class ZILayer(layers.Layer):
         """
         eps=1e-20
         return -tf.math.log(-tf.math.log(tf.random.uniform(shape=shape) + eps) + eps)
-
 
 class Encoder(layers.Layer):
 
@@ -942,15 +945,16 @@ def load_weights(dataset, model, class_name='', n_classes=0):
     model: tf.keras.models.Model,
         Trained model.
     """
-    weights_filename = dataset + '_' + class_name + '_' + model + '_trained.h5'
+    name = dataset + '_' + class_name + '_' + model
+    weights_filename = name + '_trained.h5'
     dataset = GSE(name=dataset, class_name=class_name)
     
-    model = models_dict[model](original_dim=dataset.n_genes)
+    model = models_dict[model](original_dim=dataset.n_genes, name=name)
     model(dataset.data_scaled)
     model.load_weights('weights/' + weights_filename)
     return dataset, model
 
-def plot_latent(dataset, model, ax=None, c=None, **kwargs):
+def plot_latent(dataset, model, cell_names=None, suffix='', ax=None, c=None):
     """
     Helper function to plot latent space from a dataset and model.
 
@@ -959,19 +963,18 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
     dataset: GSE object.
         Dataset to plot.
     model: tf.keras.Model,
-        Model to generate latent space
-    ax: plt.Axes, optional.
-        Ax on which to plot latent space.
+        Model to generate latent space.
+    cell_names: list of strings.
+        Labels of cells to plot.
+    suffix: str
+        Suffix of output file name.
     c: array-like of ints, optional
         Encoding to colour points in latent space.
-    **kwargs: kwargs to pass to plt.scatter
 
     Returns
     -------
     ax: axis
     """
-
-    ax = ax or plt.gca()
 
     z = model.encode(dataset.data_scaled)
 
@@ -983,8 +986,35 @@ def plot_latent(dataset, model, ax=None, c=None, **kwargs):
 
     z_tsne = TSNE(random_state=42).fit_transform(z)
 
-    ax.scatter(z_tsne[:, 0], z_tsne[:, 1], c=c, **kwargs)
-    return ax
+
+    TOOLTIPS=[
+        ('cell_names', '@cell_names')
+    ]
+    cmap = plt.cm.get_cmap('rainbow')
+    
+    colors = [
+        "#%02x%02x%02x" % tuple((np.array(cmap(i)[:3]) * 255).astype(int)) for i in (255 // max(c)) * c
+    ]
+
+    output_file('bokeh_plots/' + model.name + suffix + ".html", title=model.name + ' - Latent Space', mode="cdn")
+
+    output_notebook()
+
+    TOOLS = "crosshair,pan,wheel_zoom,box_zoom,reset,box_select,lasso_select"
+
+    if cell_names is None:
+        cell_names = list(dataset.cell_labels)
+
+    source = ColumnDataSource(dict(
+        x=list(z_tsne[:, 0]),
+        y=list(z_tsne[:, 1]),
+        colors=colors,
+        cell_names=cell_names))
+
+    p = figure(plot_height=9 * 70, plot_width=16 * 70, tools=TOOLS, tooltips=TOOLTIPS)
+    p.circle('x', 'y', fill_color='colors', fill_alpha=0.6, line_color=None, size=8, source=source)
+    show(p)
+    
 
 def plot_reconstructions(dataset, model, figsize=(16, 20)):
 

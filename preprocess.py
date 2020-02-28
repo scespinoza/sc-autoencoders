@@ -55,7 +55,7 @@ class GSE:
         'GSE131928_10x': lambda i: i.split('_')[0],
         'GSE131928_SmartSeq2': lambda i: i.split('-')[0],
         'GSE72056_cell': lambda i: i.split('_')[-1],
-        'full_data': lambda i: i,
+        'all_data_new': lambda i: i,
     }
 
     def __init__(self, name='GSE57872', class_name=None):
@@ -68,7 +68,7 @@ class GSE:
     def load(self):
         if self.name == 'GSE103224':
             self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col=1).drop("0", axis=1).astype('float32').T
-        elif self.name == 'full_data':
+        elif 'all_data' in self.name:
              self.data = pd.read_csv('data/' + self.name + '.txt', sep='\t', index_col='tumor').drop(["cell", "dataset"], axis=1).astype('float32')
 
         else:
