@@ -55,7 +55,7 @@ class GSE:
         'GSE131928_10x': lambda i: i.split('_')[0],
         'GSE131928_SmartSeq2': lambda i: i.split('-')[0],
         'GSE72056_cell': lambda i: i.split('_')[-1],
-        'full_data': lambda i: i,
+        'all_data_new': lambda i: i,
     }
 
     def __init__(self, name='GSE57872', class_name=None):
