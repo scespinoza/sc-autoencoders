@@ -17,6 +17,8 @@ import seaborn as sns
 from preprocess import GSE
 from bokeh.models import ColumnDataSource
 from bokeh.plotting import figure, output_file, output_notebook, show
+from bokeh.models import CustomJS, Button
+from bokeh.layouts import column
 from bokeh.palettes import all_palettes
 
 
@@ -994,7 +996,7 @@ def plot_latent(dataset, model, cell_names=None, suffix='', ax=None, c=None):
     
     colors = [
         "#%02x%02x%02x" % tuple((np.array(cmap(i)[:3]) * 255).astype(int)) for i in (255 // max(c)) * c
-    ]
+    ]   
 
     output_file('bokeh_plots/' + model.name + suffix + ".html", title=model.name + ' - Latent Space', mode="cdn")
 
@@ -1011,11 +1013,28 @@ def plot_latent(dataset, model, cell_names=None, suffix='', ax=None, c=None):
         colors=colors,
         cell_names=cell_names))
 
+    savebutton = Button(label="Save", button_type="success")
+    savebutton.callback = CustomJS(args=dict(source_data=source), code="""
+        var inds = source_data.selected['1d'].indices;
+        var data = source_data.data;
+        var out = "";
+        for (i = 0; i < inds.length; i++) {
+            out += "" + data['cell_names'][inds[i]] + ";";
+        }
+        var file = new Blob([out], {type: 'text/plain'});
+        var elem = window.document.createElement('a');
+        elem.href = window.URL.createObjectURL(file);
+        elem.download = 'selected-data.txt';
+        document.body.appendChild(elem);
+        elem.click();
+        document.body.removeChild(elem);
+        """)
+
     p = figure(plot_height=9 * 70, plot_width=16 * 70, tools=TOOLS, tooltips=TOOLTIPS)
     p.circle('x', 'y', fill_color='colors', fill_alpha=0.6, line_color=None, size=8, source=source)
-    show(p)
+    plot = column(p, savebutton)
+    show(plot)
     
-
 def plot_reconstructions(dataset, model, figsize=(16, 20)):
 
     """
