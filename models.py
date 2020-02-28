@@ -1019,7 +1019,7 @@ def plot_latent(dataset, model, cell_names=None, suffix='', ax=None, c=None):
         var data = source_data.data;
         var out = "";
         for (i = 0; i < inds.length; i++) {
-            out += "(" + data['x'][inds[i]] + ", " + data['y'][inds[i]] + ", " + data['cell_names'][inds[i]] + ") ";
+            out += data['cell_names'][inds[i]] + ',\n';
         }
         var file = new Blob([out], {type: 'text/plain'});
         var elem = window.document.createElement('a');
